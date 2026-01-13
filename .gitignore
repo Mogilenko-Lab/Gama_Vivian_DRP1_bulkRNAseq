@@ -49,6 +49,7 @@ Thumbs.db
 *.log
 *.cache
 docs/.ref/*
+03_Results/02_Analysis/Explorer/
 
 # Large data files (optional - uncomment if needed)
 # *.fastq
