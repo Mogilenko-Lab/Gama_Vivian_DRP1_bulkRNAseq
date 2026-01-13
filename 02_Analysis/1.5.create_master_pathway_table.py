@@ -9,6 +9,12 @@ Creates a comprehensive master table of all pathways tested in GSEA analysis wit
 3. All GSEA statistics (NES, pvalue, p.adjust, qvalue, enrichmentScore, setSize)
 4. Pattern classification for G32A and R403C
 5. Change consistency between mutants
+6. Time contrast values (Time_Ctrl, Time_G32A, Time_R403C) for maturation context
+
+Time_Ctrl represents normal maturation (D65_Ctrl - D35_Ctrl) and provides
+biological context for interpreting TrajDev patterns:
+- High |NES_Time_Ctrl| with opposite-sign TrajDev suggests failure to mature
+- Low |NES_Time_Ctrl| with high |NES_TrajDev| suggests active aberrant regulation
 
 This table provides complete information for all pathways across all contrasts,
 enabling comprehensive downstream analysis and interpretation.
@@ -105,9 +111,11 @@ def load_pattern_classifications():
                  'NES_Early_G32A', 'NES_Early_R403C',
                  'NES_Late_G32A', 'NES_Late_R403C',
                  'NES_TrajDev_G32A', 'NES_TrajDev_R403C',
+                 'NES_Time_Ctrl', 'NES_Time_G32A', 'NES_Time_R403C',
                  'p.adjust_Early_G32A', 'p.adjust_Early_R403C',
                  'p.adjust_Late_G32A', 'p.adjust_Late_R403C',
-                 'p.adjust_TrajDev_G32A', 'p.adjust_TrajDev_R403C']
+                 'p.adjust_TrajDev_G32A', 'p.adjust_TrajDev_R403C',
+                 'p.adjust_Time_Ctrl', 'p.adjust_Time_G32A', 'p.adjust_Time_R403C']
 
     # Only keep columns that exist
     existing_cols = [col for col in data_cols if col in df_patterns.columns]
@@ -283,6 +291,24 @@ def create_master_table(df_long, df_patterns):
         'NES_TrajDev_R403C',
         'NES_Late_G32A',
         'NES_Late_R403C',
+
+        # Time contrast NES values (maturation context)
+        'NES_Time_Ctrl',
+        'NES_Time_G32A',
+        'NES_Time_R403C',
+
+        # Trajectory p.adjust values
+        'p.adjust_Early_G32A',
+        'p.adjust_Early_R403C',
+        'p.adjust_TrajDev_G32A',
+        'p.adjust_TrajDev_R403C',
+        'p.adjust_Late_G32A',
+        'p.adjust_Late_R403C',
+
+        # Time contrast p.adjust values
+        'p.adjust_Time_Ctrl',
+        'p.adjust_Time_G32A',
+        'p.adjust_Time_R403C',
 
         # Significance flags
         'ever_significant',
