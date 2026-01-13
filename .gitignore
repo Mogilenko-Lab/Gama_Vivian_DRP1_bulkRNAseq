@@ -8,6 +8,10 @@ CLAUDE.md
 AGENT.md
 NEXT_SESSION*
 SESSION_SUMMARY*
+.env
+.mcp.json
+.gemini/
+docs/TIME_CTRL_CONTEXT.md
 
 
 # R specific
@@ -44,6 +48,7 @@ Thumbs.db
 *.tmp
 *.log
 *.cache
+docs/.ref/*
 
 # Large data files (optional - uncomment if needed)
 # *.fastq
