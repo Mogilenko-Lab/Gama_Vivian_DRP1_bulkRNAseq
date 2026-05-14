@@ -2,7 +2,7 @@
 MASTER GSVA TABLE SUMMARY
 ==============================================================================
 
-Generated: 2025-12-03 21:43:28.473441
+Generated: 2026-05-13 03:28:10.874555
 
 --- MASTER TABLE (master_gsva_focused_table.csv) ---
 Total rows: 42
@@ -16,10 +16,10 @@ Total comparisons (mutants vs controls): 28
 Significant comparisons (p.adj < 0.05): 0
 
 Significant comparisons by module:
+  ATP_Hydrolysis: 0
   Cytoplasmic_Translation: 0
   Mito_Ribosome_Assembly: 0
   Mitochondrial_Ribosome: 0
-  mtDNA_Maintenance: 0
   OXPHOS: 0
   Ribosome_Biogenesis: 0
   Synaptic_Ribosomes: 0
@@ -38,11 +38,11 @@ Change consistency:
 
 --- MODULE GENE COUNTS ---
   Ribosome Biogenesis (GO:BP): 158 genes
+  mtDNA Maintenance (MitoCarta): 147 genes
   OXPHOS (MitoCarta): 139 genes
   Mitochondrial Ribosome (MitoCarta):  77 genes
   Cytoplasmic Translation (GO:BP):  76 genes
   Synaptic Ribosomes (SynGO):  65 genes
-  mtDNA Maintenance (MitoCarta):  29 genes
   Mito Ribosome Assembly (MitoCarta):  24 genes
 
 ==============================================================================

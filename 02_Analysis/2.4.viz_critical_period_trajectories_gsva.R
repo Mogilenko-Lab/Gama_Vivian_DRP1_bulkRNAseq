@@ -176,6 +176,19 @@ if (!is.null(gobp_res_g32a)) {
 
 message(sprintf("  Synaptic ribosomes: %d genes", length(synaptic_ribosome_genes)))
 
+# --- ATP Hydrolysis module (from GO MF) ---
+atp_hydrolysis_genes <- c()
+gomf_res_g32a <- all_gsea_results[["G32A_vs_Ctrl_D35"]][["gomf"]]
+if (!is.null(gomf_res_g32a)) {
+  res_df <- gomf_res_g32a@result
+  idx <- res_df$ID == "GOMF_ATP_HYDROLYSIS_ACTIVITY"
+  if (any(idx)) {
+    row <- res_df[idx, ][1, ]
+    atp_hydrolysis_genes <- unlist(strsplit(row$core_enrichment, "/"))
+    message(sprintf("  ATP Hydrolysis: %d genes", length(atp_hydrolysis_genes)))
+  }
+}
+
 # --- MitoCarta modules (from GMX file) ---
 
 # Helper function to extract genes for a pathway
@@ -185,15 +198,13 @@ extract_mitocarta_genes <- function(T2G, pathway_pattern) {
   return(genes)
 }
 
-# Extract the 4 core MitoCarta pathways
+# Extract the core MitoCarta pathways
 mito_ribosome_genes <- extract_mitocarta_genes(T2G, "Mitochondrial_ribosome$")
 mito_ribo_assembly_genes <- extract_mitocarta_genes(T2G, "Mitochondrial_ribosome_assembly")
-mtdna_maintenance_genes <- extract_mitocarta_genes(T2G, "mtDNA_maintenance")
 oxphos_genes <- extract_mitocarta_genes(T2G, "^OXPHOS$")
 
 message(sprintf("  Mitochondrial ribosome: %d genes", length(mito_ribosome_genes)))
 message(sprintf("  Mito ribosome assembly: %d genes", length(mito_ribo_assembly_genes)))
-message(sprintf("  mtDNA maintenance: %d genes", length(mtdna_maintenance_genes)))
 message(sprintf("  OXPHOS: %d genes", length(oxphos_genes)))
 
 # ============================================================================ #
@@ -212,8 +223,8 @@ module_info <- list(
        genes = mito_ribosome_genes, panel = "D"),
   list(key = "Mito_Ribosome_Assembly", display = "Mito Ribosome Assembly",
        genes = mito_ribo_assembly_genes, panel = "E"),
-  list(key = "mtDNA_Maintenance", display = "mtDNA Maintenance",
-       genes = mtdna_maintenance_genes, panel = "F"),
+  list(key = "ATP_Hydrolysis", display = "ATP Hydrolysis",
+       genes = atp_hydrolysis_genes, panel = "F"),
   list(key = "OXPHOS", display = "OXPHOS",
        genes = oxphos_genes, panel = "G")
 )

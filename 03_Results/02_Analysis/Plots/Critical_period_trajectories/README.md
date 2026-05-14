@@ -127,7 +127,7 @@ Located in `gsva/data/`
 ### Visual Elements
 
 **Individual sample points:**
-- Small semi-transparent dots (n=3 biological replicates per group/timepoint)
+- Small semi-transparent dots (n=3–6 biological replicates per group/timepoint, unbalanced)
 - X-axis jittered by ±0.5 days to prevent overplotting
 - Show biological variability and reproducibility
 
