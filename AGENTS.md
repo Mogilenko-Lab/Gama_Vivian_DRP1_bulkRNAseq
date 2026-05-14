@@ -1,348 +1,109 @@
 # AGENTS.md - Universal AI Agent Instructions for Gama_Vivian_DRP1_bulkRNAseq
 
-**Version:** 2.0.0
-**Generated:** 2026-01-07
-**Purpose:** Single source of truth for AI agent behavior in this bioinformatics project
+**Version:** 2.2.0
+**Generated:** 2026-05-11
+**Purpose:** Single source of truth for AI agent behavior in the project
 
 ---
 
-> **This file is the canonical reference for ALL AI agents** (Claude, Gemini, Codex, etc.) working on this project.
-> Vendor-specific files (`CLAUDE.md`, `GEMINI.md`) should reference this document rather than duplicate content.
+## 1. Rigorous AI Validation & Cross-Checking Rules
 
----
+**CRITICAL: NEVER guess or assume technical implementation details. Always verify empirically.** 
 
-## 1. Agent Role & Identity
 
-You are a **bioinformatics expert** specialized in RNA-seq analysis. Your role is to assist with computational biology workflows following standardized patterns that ensure reproducibility, consistency, and scientific rigor.
+1. **Verify R API and Default Parameters:**
+   - **Do not guess** what default parameters are
+   - Before confirming or denying a claim about parameters, check the actual function signature
 
-### Core Competencies
+2. **Verify Experimental Design and Metadata:**
+   - You MUST read and parse the actual `metadata.csv` (e.g., using `head` and R scripts) to determine the true group sizes. 
+   - Example: Run `Rscript -e 'meta <- read.csv("03_Results/01_Preprocessing/04_FeatureCounts/count_matrices_fc/metadata.csv", sep=";"); table(meta$days, meta$genotype)'` to find the smallest group size
 
-- **Differential Expression Analysis**: limma-voom, DESeq2, edgeR
-- **Gene Set Enrichment**: GSEA, ORA, custom gene sets
-- **Metabolic analysis**: GATOM
-- **Transcription factor predictions**: decoupleR
-- **Data Visualization**: Publication-quality plots, interactive dashboards
-- **Reproducible Workflows**: Checkpoint caching, master tables, modular code
+3. **Verify Code Invocation:**
+   - Check if the code actually passes the claimed arguments, or if it relies on defaults
 
-### Guiding Philosophy
+4. **Verify Final Data States (Checkpoints):**
+   - Use R to load the intermediate RDS checkpoints and check the dimensions: 
+     `Rscript -e 'obj <- readRDS("03_Results/02_Analysis/checkpoints/model_objects.rds"); print(nrow(obj$DGE))'`
 
-1. **Follow established patterns** - Don't reinvent; use toolkit functions; only create new scripts when no alternative available
-2. **Cache expensive operations** - Always use `load_or_compute()` pattern
-3. **Separate concerns** - Processing scripts never plot; viz scripts never compute
-4. **Document outputs** - Every folder gets a README
+## 2. Workspace & Environment Clutter Rules (CRITICAL FOR AGENTS)
 
----
+**NO CLUTTER:**
+- Do NOT leave stale test artifacts, temporary scripts (e.g., `test.py`, `debug.R`), or diagnostic output files scattered around the root or analysis directories.
+- If you create a temporary file to debug an environment issue (like PDF rendering or library imports), you MUST delete it after extracting the necessary insight.
+- The repository must remain clean and strictly follow the documented directory architecture.
 
-## 2. Project Context
+**Environment Navigation:**
+- Assume Python scripts are run using `python3` with standard data science libraries (`pandas`, `numpy`, `matplotlib`, `seaborn`) available.
+- R scripts are executed via `Rscript` or sourced within an R session.
+- If dependencies are missing, do not attempt to globally install them without asking, or use a temporary virtual environment that you clean up afterward.
+- Be careful with `matplotlib` outputs to PDF; prefer rasterizing heatmaps (`rasterized=True` in seaborn) and embedding fonts (`mpl.rcParams['pdf.fonttype'] = 42`) to avoid viewer rendering bugs.
 
-**Project ID:** Gama_Vivian_DRP1_bulkRNAseq
-**Title:** Gama_Vivian_DRP1_bulkRNAseq
-**Species:** Mus musculus
-**Design:** TBD
+## 3. Critical Coding Rules
+1. **Annotate genes BEFORE filtering** - Never lose gene IDs by filtering first.
+2. **Use `filterByExpr()`** - Never use manual count thresholds like `rowSums >= 10`.
+3. **Cache anything >1 minute** - Always use the `load_or_compute()` pattern for GSEA, DE fitting, etc.
+4. **Never hardcode colors** - Load project colors via `source("02_analysis/config/color_config.R")` (or `01_Scripts/R_scripts/color_config.R`).
+5. **Separate concerns** - Processing scripts never plot; viz scripts never compute.
 
-**See:** `context.md` for biological question, datasets, and hypotheses.
+## 3a. Python Style — No Inlining Inside `main()`
 
----
+**Rule: Never define helper functions *inside* `main()` (or any other function). Every function must be a top-level named module-level block.**
 
-## 3. Methodology Reference
+When writing or refactoring Python scripts in `02_Analysis/`:
 
-Detailed analysis guidelines are maintained in the toolkit:
+- **Extract** lambdas, nested `def`s, and ad-hoc inline logic into their own top-level `def func_name(...)`. Each function should have its own ``"""docstring"""`` and be placed in a clearly labeled section of the file (e.g., `# == Low-level helpers`, `# ==== High-level orchestration`).
+- **`main()` should be a thin orchestrator** - it reads config/ data, calls helpers, and writes outputs. No business logic belongs inline in the `if __name__ == "__main__":` guard or `main()`.  
+- **`_-prefixed` names are "private to the module" and **should appear _after_ `main()`** in the source file to make the public API surface immediately visible to the reader.  
 
-### Core Guidelines (`01_modules/SciAgent-toolkit/docs/guidelines/`)
+Anti-pattern:
+```python
+def main():
+    def inline_helper(x):  # ← NEVER
+        pass
+    pass
+```
 
-| Module | When to Reference |
-|--------|-------------------|
-| **[core_architecture.md](01_modules/SciAgent-toolkit/docs/guidelines/core_architecture.md)** | Starting any project, understanding structure |
-| **[data_processing.md](01_modules/SciAgent-toolkit/docs/guidelines/data_processing.md)** | DE analysis, filtering, normalization |
-| **[gsea_analysis.md](01_modules/SciAgent-toolkit/docs/guidelines/gsea_analysis.md)** | Pathway enrichment, MSigDB usage |
-| **[checkpoint_caching.md](01_modules/SciAgent-toolkit/docs/guidelines/checkpoint_caching.md)** | Any expensive computation |
-| **[master_tables.md](01_modules/SciAgent-toolkit/docs/guidelines/master_tables.md)** | Exporting results, R/Python bridging |
-| **[visualization.md](01_modules/SciAgent-toolkit/docs/guidelines/visualization.md)** | Creating plots, colors, themes |
-| **[code_style.md](01_modules/SciAgent-toolkit/docs/guidelines/code_style.md)** | Writing any code |
+Pattern:
+```python
+def _inline_helper(x):  # ← ALWAYS top-level
+    """Compute something useful."""
+    pass
 
-**Quick Reference**: See [01_modules/SciAgent-toolkit/docs/guidelines/README.md](01_modules/SciAgent-toolkit/docs/guidelines/README.md) for complete index.
+def main():  # thin orchestrator
+    _inline_helper(data)
+```
 
----
+## 4. Directory Structure & Architecture
 
-## 4. Critical Rules
+The project follows a **5-Phase Workflow**:
 
-### 4.1 Data Processing Rules
+| Phase | Description | Key Scripts | Key Outputs |
+|-------|-------------|-------------|-------------|
+| **1** | Core Analysis (DE, GSEA)| `02_Analysis/1.x.*.R` | `checkpoints/*.rds` |
+| **2** | Master Tables | `02_Analysis/2.x.*.R` | `tables/master_*.csv` |
+| **3** | R Visualization | `02_Analysis/3.x.*.R` | `plots/` |
+| **4** | Python Visualization | `02_Analysis/4.x.*.py`| `plots/Publication/` |
+| **5** | Interactive Dashboards| `02_Analysis/5.x.*` | `interactive/` |
 
-1. **Annotate genes BEFORE filtering** - Never lose gene IDs by filtering first
-2. **Use `filterByExpr()`** - Never use manual count thresholds like `rowSums >= 10`
-3. **Gene symbols for MSigDB GSEA** - MSigDB uses gene symbols, not Ensembl IDs
-4. **msigdbr API** - Use `species` parameter only, never `db_species`
+**Key Locations:**
+- `00_Data/`: Input data (read-only)
+- `01_Scripts/`: Shared code (RNAseq-toolkit, R_scripts helper functions)
+- `02_Analysis/`: Project-specific scripts and execution pipelines
+- `03_Results/`: All outputs (checkpoints, tables, plots)
 
+## 5. Configuration System
+
+All hardcoded values/thresholds go in configuration files, usually referenced centrally:
+**Importing Config in R:**
 ```r
-# CORRECT: Annotate first
-dge <- annotate_genes(dge)
-dge <- filter_lowly_expressed(dge)
-
-# WRONG: Filter first
-dge <- filter_lowly_expressed(dge)
-dge <- annotate_genes(dge)  # Missing genes!
-```
-
-### 4.2 Caching Rules
-
-1. **Cache anything >1 minute** - GSEA, DE fitting, annotations
-2. **Use `load_or_compute()` pattern** - Standard caching function
-3. **Checkpoint naming** - `{phase}.{step}_{description}.rds`
-
-```r
-result <- load_or_compute(
-  checkpoint_file = "1.3_gsea_results.rds",
-  description = "GSEA analysis",
-  compute_fn = function() { ... }
-)
-```
-
-### 4.3 Visualization Rules
-
-1. **Colorblind-safe palettes** - Okabe-Ito for categories, Blue-Orange diverging
-2. **Never hardcode colors** - Use config values
-3. **DPI >= 300** - Publication quality
-4. **Both PDF and PNG** - Vector for publication, raster for preview
-
-```r
-# Load project colors
-source("02_analysis/config/color_config.R")
-```
-
-### 4.4 Code Organization Rules
-
-1. **Processing** - `1.x.*.R` scripts, output to checkpoints
-2. **Master tables** - `2.x.*.R` scripts, output to `tables/`
-3. **R visualization** - `3.x.*.R` scripts, output to `plots/`
-4. **Python/Interactive** - `4.x.*.py` scripts, output to `interactive/`
-
----
-
-## 5. Directory Structure
-
-```
-Gama_Vivian_DRP1_bulkRNAseq/
-├── 00_data/                    # READ-ONLY input data
-│   ├── processed/              # Count matrices
-│   └── references/             # Gene sets, annotations
-│
-├── 01_modules/                 # Shared tools (git submodules)
-│   ├── RNAseq-toolkit/         # Reusable analysis functions
-│   └── SciAgent-toolkit/       # AI agent infrastructure
-│
-├── 02_analysis/                # Project-specific code
-│   ├── config/                 # Configuration files
-│   │   ├── pipeline.yaml       # Single source of truth
-│   │   ├── config.R            # R config loader
-│   │   └── color_config.R      # Color palettes
-│   ├── 1.x.*.R                 # Phase 1: Data preparation
-│   ├── 2.x.*.R                 # Phase 2: Analysis processing
-│   ├── 3.x.*.R                 # Phase 3: R visualization
-│   └── 4.x.*.py                # Phase 4-5: Python/interactive
-│
-├── 03_results/                 # Generated outputs
-│   ├── checkpoints/            # Cached RDS objects
-│   ├── tables/                 # Master CSV exports
-│   ├── plots/                  # Publication figures
-│   └── interactive/            # HTML dashboards
-│
-├── AGENTS.md                   # This file - Universal AI rules
-├── CLAUDE.md                   # Claude Code context
-├── GEMINI.md                   # Gemini context
-├── context.md                  # Biological question, datasets
-├── tasks.md                    # Task tracker
-└── notes.md                    # Research notes
-```
-
----
-
-## 6. Configuration System
-
-### 6.1 Project-Specific Values
-
-All hardcoded values go in `02_analysis/config/analysis_config.yaml`:
-
-```yaml
-project:
-  id: "Gama_Vivian_DRP1_bulkRNAseq"
-  species: "Mus musculus"
-
-thresholds:
-  de_fdr: 0.05
-  de_logfc: 1.0
-  gsea_nperm: 100000
-
-colors:
-  diverging:
-    down: "#2166AC"
-    neutral: "#F7F7F7"
-    up: "#B35806"
-  databases:
-    Hallmark: "#E69F00"
-    KEGG: "#56B4E9"
-    Reactome: "#009E73"
-```
-
-### 6.2 Importing Config
-
-**R:**
-```r
-config <- yaml::read_yaml("02_analysis/config/analysis_config.yaml")
+config <- yaml::read_yaml("02_analysis/config/analysis_config.yaml") # if used
 DE_FDR_CUTOFF <- config$thresholds$de_fdr
 ```
 
-**Python:**
-```python
-import yaml
-with open("02_analysis/config/analysis_config.yaml") as f:
-    config = yaml.safe_load(f)
-de_fdr_cutoff = config['thresholds']['de_fdr']
-```
+## 6. Current Status & Task Execution
 
----
-
-## 7. Specialized Agents
-
-### 7.1 Available Agents (`.claude/agents/`)
-
-Agents are symlinked from the toolkit. Check what's available:
-
-```bash
-ls -la .claude/agents/
-```
-
-| Agent | Purpose |
-|-------|---------|
-| **bioinf-librarian** | Find tools, documentation, resources |
-| **rnaseq-methods-writer** | Generate publication Methods sections |
-| **figure-caption-generator** | Create README.md with figure legends |
-| **bio-research-visualizer** | Biological mechanism research + viz |
-
-### 7.2 Using Agents
-
-Reference agents in prompts:
-```
-"Use the rnaseq-methods-writer to document my analysis"
-"Find the best tool for scATAC-seq peak calling"
-```
-
----
-
-## 8. MCP Tools
-
-### 8.1 PAL (Collaboration & Planning)
-
-| Tool | Use Case |
-|------|----------|
-| `chat` | Brainstorm, validate approaches |
-| `thinkdeep` | Extended reasoning for complex problems |
-| `planner` | Break down projects into actionable plans |
-| `consensus` | Get opinions from multiple AI models |
-| `debug` | Systematic root cause analysis |
-| `codereview` | Professional code reviews |
-
-### 8.2 Context7 (Documentation Lookup)
-
-For API/library documentation:
-```
-"Look up the latest clusterProfiler documentation"
-"Find fgsea usage examples"
-```
-
-### 8.3 ToolUniverse (Scientific Tools)
-
-600+ scientific research tools including:
-- ChEMBL, DrugBank, FDA (drug discovery)
-- UniProt, protein databases (genomics)
-- PubMed, Europe PMC (literature)
-- ClinicalTrials.gov (clinical)
-
----
-
-## 9. Workflow Checklist
-
-### 9.1 Starting a New Analysis
-
-- [ ] Read `context.md` for biological question
-- [ ] Check `02_analysis/config/analysis_config.yaml` for project parameters
-- [ ] Look for existing checkpoints before recomputing
-- [ ] Follow phase-based execution model
-
-### 9.2 Writing Code
-
-- [ ] Source `config.R` at script start
-- [ ] Use `load_or_compute()` for expensive operations
-- [ ] Follow naming conventions (`{phase}.{step}_{desc}`)
-- [ ] Add progress messages with `message()`
-- [ ] Document outputs in README
-
-### 9.3 Creating Visualizations
-
-- [ ] Read from master tables or checkpoints (never recompute)
-- [ ] Use colorblind-safe palettes from config
-- [ ] Save both PDF and PNG formats
-- [ ] Create README with figure legends
-
-### 9.4 Completing Tasks
-
-- [ ] Update checkpoints if data changed
-- [ ] Regenerate master tables if needed
-- [ ] Update `tasks.md` with progress
-- [ ] Document findings in `notes.md`
-
----
-
-## 10. Quick Reference
-
-### Common Commands
-
-```bash
-# Run core pipeline
-Rscript 02_analysis/1.1.core_pipeline.R
-
-# Run all visualizations
-for script in 02_analysis/3.*.R; do Rscript "$script"; done
-
-# Generate interactive dashboard
-python 02_analysis/4.1.pathway_explorer.py
-```
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `context.md` | Biological question and hypotheses |
-| `tasks.md` | Concrete implementation steps |
-| `notes.md` | Web research and literature notes |
-| `02_analysis/config/analysis_config.yaml` | Project parameters |
-| `03_results/checkpoints/*.rds` | Cached computation results |
-| `03_results/tables/master_*.csv` | Standardized result tables |
-
-### Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| GSEA slow | Check for existing checkpoint |
-| Missing genes | Annotate BEFORE filtering |
-| Plot colors wrong | Use config values, not hardcoded |
-| msigdbr error | Remove `db_species`, use `species` only |
-
----
-
-## 11. Current Status
-
-<!-- Update this section as analysis progresses -->
-
-| Stage | Status | Key Outputs |
-|-------|--------|-------------|
-| S1: Core DE/GSEA | ⏸️ Pending | `checkpoints/1.1_*.rds` |
-| S2: Master Tables | ⏸️ Pending | `tables/master_*.csv` |
-| S3: R Visualizations | ⏸️ Pending | `plots/` |
-| S4: Python/Interactive | ⏸️ Pending | `interactive/` |
-
----
-
-## Version History
-
-- **2.0.0** (2026-01-07): Comprehensive project template with embedded methodology
-- **1.0.0** (2025-12-10): Initial version
+When asked to perform analysis:
+1. Review this file (`AGENTS.md`) for methodology and verification rules.
+2. Load relevant checkpoints (`03_Results/02_Analysis/checkpoints/`) instead of re-running raw data processing.
+3. Keep track of progress in `tasks.md`.

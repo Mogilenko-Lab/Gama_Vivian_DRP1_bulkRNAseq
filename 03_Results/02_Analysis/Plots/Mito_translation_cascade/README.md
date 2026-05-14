@@ -18,7 +18,7 @@ This figure complements the synaptic ribosome analysis (Panel_C_Expression_Heatm
 - **Cell type**: iPSC-derived cortical neurons
 - **Mutations**: DRP1 G32A (GTPase domain) and R403C (stalk domain)
 - **Timepoints**: Day 35 (early maturation) and Day 65 (late maturation)
-- **Replicates**: n=3 biological replicates per condition
+- **Replicates**: 25 samples total across genotypes/timepoints (n=3–6 per group)
 - **Sequencing**: Bulk RNA-seq, paired-end 150bp
 
 ### Contrasts Displayed

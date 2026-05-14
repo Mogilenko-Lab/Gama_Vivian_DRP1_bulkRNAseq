@@ -5,6 +5,41 @@
 ## This script documents all R packages used in the analysis pipeline       ##
 ## for reproducibility purposes.                                            ##
 ###############################################################################
+##                                                                           ##
+## msigdbr API divergence                                                    ##
+## --------------------------------------------------------                  ##
+## The analysis was developed across the msigdbr 7.x -> 10.x transition,    ##
+## which introduced a breaking API change AND quietly renamed the KEGG     ##
+## subcollection. The two versions are NOT interoperable for the GSVA      ##
+## pipeline:                                                                ##
+##                                                                           ##
+##   parameter:      7.5.1  uses  category=     ;  10.x  uses  collection=   ##
+##   subcat column:  7.5.1  uses  gs_subcat     ;  10.x  uses  gs_subcollection ##
+##   KEGG subcat:    7.5.1  has   "CP:KEGG"     ;  10.x  splits into          ##
+##                                                  "CP:KEGG_LEGACY" +       ##
+##                                                  "CP:KEGG_MEDICUS"        ##
+##                                                                           ##
+## Concretely: the master GSEA table (master_gsea_table.csv) was produced   ##
+## with msigdbr 10.x and contains KEGG_MEDICUS pathways. Running the GSVA   ##
+## pipeline against msigdbr 7.5.1 produces ONLY the legacy "KEGG_*" set     ##
+## names, which never overlap with the GSEA universe — so click-through    ##
+## modals fall back to "no GSVA data" for every KEGG pathway. The same     ##
+## is true for SynGO (GO IDs in GSEA vs human-readable term names in       ##
+## msigdbr-based loaders).                                                  ##
+##                                                                           ##
+## To keep the GSVA pathway-id space identical to the GSEA universe        ##
+## regardless of the locally-installed msigdbr version,                    ##
+## 02_Analysis/1.6.gsva_analysis.R reads its gene-set library from the     ##
+## GSEA result checkpoints (03_Results/02_Analysis/checkpoints/             ##
+## all_gsea_results.rds, mitocarta_gsea_results.rds, syngo_gsea_results.rds)##
+## via each gseaResult's @geneSets slot. This is the canonical source of   ##
+## truth and bypasses msigdbr entirely for gene-set assembly. If you ever  ##
+## need to recompute the GSEA checkpoints, do so with the SAME msigdbr     ##
+## version that produced the prior run (or accept that downstream IDs may  ##
+## shift). The 7.x detection branch in the script is kept only as a       ##
+## fallback in case the checkpoints are unavailable.                        ##
+##                                                                           ##
+###############################################################################
 
 library(here)
 
@@ -57,6 +92,35 @@ cat("###########################################################################
 cat("## Generated:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("## Purpose: Document R package versions for reproducibility\n")
 cat("###############################################################################\n\n")
+
+cat("###############################################################################\n")
+cat("## msigdbr API divergence — important for re-running the GSVA pipeline\n")
+cat("###############################################################################\n")
+cat("## The analysis was developed across the msigdbr 7.x -> 10.x transition.\n")
+cat("## msigdbr 10.x renamed the call API and the subcategory column AND split KEGG:\n")
+cat("##\n")
+cat("##   parameter:      7.5.1  uses  category=     ;  10.x  uses  collection=\n")
+cat("##   subcat column:  7.5.1  uses  gs_subcat     ;  10.x  uses  gs_subcollection\n")
+cat("##   KEGG subcat:    7.5.1  has   \"CP:KEGG\"     ;  10.x  splits into\n")
+cat("##                                                  \"CP:KEGG_LEGACY\" +\n")
+cat("##                                                  \"CP:KEGG_MEDICUS\"\n")
+cat("##\n")
+cat("## 02_Analysis/1.6.gsva_analysis.R now reads its gene-set library from\n")
+cat("## the GSEA result checkpoints (all_gsea_results.rds, mitocarta_gsea_\n")
+cat("## results.rds, syngo_gsea_results.rds) via each gseaResult's @geneSets\n")
+cat("## slot — NOT from msigdbr. This makes the GSVA pathway-id universe equal\n")
+cat("## the GSEA universe by construction, regardless of the locally\n")
+cat("## installed msigdbr version. The legacy msigdbr-based load is kept as a\n")
+cat("## dead-code fallback in the script header comment only; the active\n")
+cat("## loader is the checkpoint-based one.\n")
+cat("###############################################################################\n\n")
+
+cat(sprintf("## Detected msigdbr version: %s\n",
+            tryCatch(as.character(packageVersion("msigdbr")),
+                     error = function(e) "NOT INSTALLED")))
+cat(sprintf("## Detected msigdbr formal args: %s\n\n",
+            tryCatch(paste(names(formals(msigdbr::msigdbr)), collapse = ", "),
+                     error = function(e) "n/a")))
 
 sessionInfo()
 

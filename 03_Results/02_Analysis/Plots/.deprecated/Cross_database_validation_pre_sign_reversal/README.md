@@ -135,7 +135,7 @@ Classifications include confidence levels: High (p < 0.05) and Medium (0.05 ≤ 
 
 **Statistical Testing**:
 - Individual pathway significance: FDR-corrected p-values from GSEA
-- Sample size: N=3 biological replicates per group
+- Sample size: 25 total (6 groups, unbalanced: n=3–6 per group)
 - Differential expression: limma-voom with TMM normalization
 
 ## Key Findings

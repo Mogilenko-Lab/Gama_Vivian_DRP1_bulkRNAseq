@@ -1,0 +1,23 @@
+metric	value
+n_combinations	81
+comp_dominates_classifiable_G32A_true	81/81
+comp_dominates_classifiable_R403C_true	0/81  (False in all — Compensation is largest active-pattern but not strict majority because Natural_improvement pulls it below 50%)
+comp_exceeds_passive_G32A_true	81/81
+comp_exceeds_passive_R403C_true	81/81
+progressive_rare_G32A_true	81/81
+progressive_rare_R403C_true	81/81
+R403C_more_compensation_true	81/81
+comp_of_classifiable_G32A_range	52.3 - 55.3%
+comp_of_classifiable_R403C_range	43.6 - 49.4%
+default_Compensation_pct_G32A	11.96%  (n=1462)
+default_Sign_reversal_pct_G32A	2.00%  (n=244)
+default_Progressive_pct_G32A	0.00%  (n=0)
+default_Complex_pct_G32A	78.28%  (n=9566)
+default_Compensation_pct_R403C	13.19%  (n=1612)
+default_Sign_reversal_pct_R403C	3.16%  (n=386)
+default_Progressive_pct_R403C	0.00%  (n=0)
+default_Complex_pct_R403C	72.42%  (n=8851)
+G32A_Compensation_range_across_grid	1190 - 1590
+R403C_Compensation_range_across_grid	1246 - 1832
+G32A_Sign_reversal_range_across_grid	145 - 397
+R403C_Sign_reversal_range_across_grid	202 - 624

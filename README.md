@@ -97,7 +97,10 @@ python3 02_Analysis/3.8.viz_interactive_bump_dashboard.py # Interactive explorer
 | **Cell type** | iPSC-derived cortical excitatory neurons |
 | **Genotypes** | Ctrl, G32A (GTPase domain), R403C (stalk domain) - heterozygous DRP1 mutations |
 | **Timepoints** | Day 35 (early maturation) and Day 65 (mature neurons) |
-| **Replicates** | N=3 biological replicates per group (18 samples total) |
+| **Replicates** | **25 samples** total across 6 groups (n=3–6 per group):
+  - **D35 Control:** n=3 | **D65 Control:** n=3
+  - **D35 G32A:** n=5 | **D65 G32A:** n=4
+  - **D35 R403C:** n=6 | **D65 R403C:** n=4 |
 | **Contrasts** | 9 contrasts: mutation effects (6), maturation effects (3), interactions (2) |
 | **Question** | How do domain-specific DRP1 mutations alter maturation trajectories and mitochondrial-synaptic coupling? |
 
@@ -259,7 +262,7 @@ cp .env.example .devcontainer/.env
 
 ### For Biological Interpretation
 
-1. **Interactive Trajectory Explorer** (`03_Results/02_Analysis/Plots/Trajectory_Flow/`)
+1. **Interactive Trajectory Dashboard** (`03_Results/02_Analysis/Plots/Trajectory_Flow/interactive_bump_dashboard.html`)
    - `interactive_bump_dashboard.html` - Explore all pathway trajectories interactively
    - `bump_focused_FINAL_paper_combined.pdf` - Key publication figure
 

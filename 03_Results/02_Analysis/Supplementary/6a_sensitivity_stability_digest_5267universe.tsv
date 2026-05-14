@@ -1,0 +1,29 @@
+metric	value
+universe	5,267 ever-significantly enriched pathways (matches RESULTS section denominator)
+definition_ever_significant	FDR<0.05 in any of 9 GSEA contrasts: G32A_vs_Ctrl_{D35,D65}, R403C_vs_Ctrl_{D35,D65}, Maturation_{G32A,R403C}_specific, Time_{Ctrl,G32A,R403C}
+n_combinations	81
+comp_dominates_classifiable_G32A_true	81/81
+comp_of_classifiable_G32A_range	54.5 - 58.5%
+NI_of_classifiable_G32A_range	21.9 - 32.7%
+G32A_Compensation_range_across_grid	1190 - 1590
+G32A_Sign_reversal_range_across_grid	145 - 397
+default_Compensation_pct_G32A	27.76% (n=1462)
+default_Sign_reversal_pct_G32A	4.63% (n=244)
+default_Complex_pct_G32A	51.91% (n=2734)
+default_Comp_pct_classifiable_G32A	57.7% (n_classif=2533)
+comp_dominates_classifiable_R403C_true	54/81
+comp_of_classifiable_R403C_range	46.9 - 54.5%
+NI_of_classifiable_R403C_range	25.0 - 37.3%
+R403C_Compensation_range_across_grid	1246 - 1832
+R403C_Sign_reversal_range_across_grid	202 - 624
+default_Compensation_pct_R403C	30.61% (n=1612)
+default_Sign_reversal_pct_R403C	7.33% (n=386)
+default_Complex_pct_R403C	41.41% (n=2181)
+default_Comp_pct_classifiable_R403C	52.2% (n_classif=3086)
+comp_exceeds_passive_G32A_true	81/81
+progressive_rare_G32A_true	81/81
+comp_exceeds_passive_R403C_true	81/81
+progressive_rare_R403C_true	81/81
+R403C_more_compensation_true	81/81
+source_script	02_Analysis/6a.sensitivity_5267universe.py
+classifier_source	02_Analysis/Supp4.sensitivity_analysis.py:classify_pattern_parameterized

@@ -135,7 +135,7 @@ Major update for manuscript resubmission with comprehensive visualization suite,
 
 **Enhancements over previous version**:
 - GSVA (Gene Set Variation Analysis) for robust pathway scores
-- Individual sample-level visualization (n=3 per condition)
+- Individual sample-level visualization (n=3–6 per group)
 - Mitochondria/ATP module added (ATP synthase, OXPHOS, dynamics)
 - Mechanistic arrows annotating energy → translation → synapse cascade
 - Divergence plots showing mutation-specific maturation failures
@@ -840,7 +840,7 @@ Frozen version corresponding to initial manuscript submission. Tagged at commit 
 
 ### Analysis Details
 
-- **Samples**: 18 (3 genotypes × 2 timepoints × 3 biological replicates)
+- **Samples**: 25 (6 groups, unbalanced: n=3–6 per group)
 - **Contrasts**: 9 statistical comparisons
   - 4 mutation effects (G32A vs Ctrl, R403C vs Ctrl at D35 and D65)
   - 3 maturation effects (Time_Ctrl, Time_G32A, Time_R403C)

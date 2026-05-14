@@ -272,7 +272,7 @@ See [Volcano/README.md](Volcano/README.md) for details.
 ### Expression Data
 
 - **Genes analyzed:** ~15,000 protein-coding genes
-- **Samples:** 18 total (3 genotypes × 2 timepoints × 3 replicates)
+- **Samples:** 25 total (6 groups, unbalanced: n=3–6 per group)
 - **Checkpoints:** `03_Results/02_Analysis/checkpoints/`
 - **Master tables:**
   - `master_gsea_table.csv` - 109,989 pathway-contrast combinations

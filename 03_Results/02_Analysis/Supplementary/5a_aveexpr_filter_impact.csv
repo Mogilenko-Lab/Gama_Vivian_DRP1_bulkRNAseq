@@ -1,0 +1,10 @@
+"contrast","n_before","n_after","n_removed","pct_removed"
+"G32A_vs_Ctrl_D35",21122,15178,5944,28.14
+"R403C_vs_Ctrl_D35",21122,15178,5944,28.14
+"G32A_vs_Ctrl_D65",21122,15178,5944,28.14
+"R403C_vs_Ctrl_D65",21122,15178,5944,28.14
+"Time_Ctrl",21122,15178,5944,28.14
+"Time_G32A",21122,15178,5944,28.14
+"Time_R403C",21122,15178,5944,28.14
+"Maturation_G32A_specific",21122,15178,5944,28.14
+"Maturation_R403C_specific",21122,15178,5944,28.14

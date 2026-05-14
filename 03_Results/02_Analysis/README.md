@@ -17,8 +17,8 @@ This directory contains the complete differential expression and pathway enrichm
 |--------|--------|-------------|
 | **Genotype** | Control, G32A, R403C | DRP1 mutation status |
 | **Timepoint** | D35, D65 | Days of neuronal maturation |
-| **Replicates** | n=3 per condition | Biological replicates |
-| **Total samples** | 18 | 3 genotypes × 2 timepoints × 3 replicates |
+| **Replicates** | 25 samples total (6 groups, unbalanced, n=3–6 per group) | Biological replicates |
+| **Total samples** | **25** (6 groups, unbalanced: n=3–6 per group) |
 
 ### Mutation Biology
 
@@ -42,6 +42,8 @@ This directory contains the complete differential expression and pathway enrichm
 │
 ├── Plots/                           # All visualizations
 │   ├── README.md                   # Comprehensive figure overview
+│   ├── Trajectory_Flow/
+│   │   └── interactive_bump_dashboard.html  # ⭐ Interactive pathway explorer
 │   ├── General/                    # QC plots (MDS, correlation, UpSet)
 │   ├── Volcano/                    # Volcano plots (8 variants)
 │   ├── GSEA/                       # Pathway enrichment (12 databases × 9 contrasts)
@@ -369,7 +371,7 @@ patterns %>%
 - **87,001 rows**: pathway × genotype × timepoint combinations
 - **~14,500 unique pathways** (after 10-500 gene size filter)
 - **All 12 databases**: Complete coverage for exploration
-- **Powers interactive explorer**: Used by `DRP1_Pathway_Explorer.html`
+- **Powers interactive dashboard**: Used by `interactive_bump_dashboard.html`
 
 **Key Columns:**
 

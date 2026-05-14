@@ -1,0 +1,97 @@
+pathway_id,category,mutation,stage,NES
+gobp::GOBP_RIBOSOMAL_LARGE_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.1348
+gobp::GOBP_RIBOSOMAL_SMALL_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.2194
+gobp::GOBP_RIBOSOMAL_SUBUNIT_EXPORT_FROM_NUCLEUS,Cytoplasmic Ribosome — biogenesis,G32A,Early,-1.8218
+gobp::GOBP_RIBOSOME_ASSEMBLY,Cytoplasmic Ribosome — biogenesis,G32A,Early,-1.7798
+gobp::GOBP_RIBOSOME_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.6007
+gocc::GOCC_90S_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.3505
+gocc::GOCC_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.4578
+gocc::GOCC_PRERIBOSOME_LARGE_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.0902
+gocc::GOCC_PRERIBOSOME_SMALL_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,G32A,Early,-2.0078
+gobp::GOBP_RIBOSOMAL_LARGE_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.3042
+gobp::GOBP_RIBOSOMAL_SMALL_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.3912
+gobp::GOBP_RIBOSOMAL_SUBUNIT_EXPORT_FROM_NUCLEUS,Cytoplasmic Ribosome — biogenesis,G32A,Late,0.6511
+gobp::GOBP_RIBOSOME_ASSEMBLY,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.0365
+gobp::GOBP_RIBOSOME_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.2157
+gocc::GOCC_90S_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,G32A,Late,-0.9640
+gocc::GOCC_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.3219
+gocc::GOCC_PRERIBOSOME_LARGE_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.2542
+gocc::GOCC_PRERIBOSOME_SMALL_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,G32A,Late,-1.2589
+gobp::GOBP_RIBOSOMAL_LARGE_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.5170
+gobp::GOBP_RIBOSOMAL_SMALL_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.4321
+gobp::GOBP_RIBOSOMAL_SUBUNIT_EXPORT_FROM_NUCLEUS,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.3943
+gobp::GOBP_RIBOSOME_ASSEMBLY,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.2723
+gobp::GOBP_RIBOSOME_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.7247
+gocc::GOCC_90S_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.8127
+gocc::GOCC_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.6223
+gocc::GOCC_PRERIBOSOME_LARGE_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.6270
+gocc::GOCC_PRERIBOSOME_SMALL_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,R403C,Early,-1.3164
+gobp::GOBP_RIBOSOMAL_LARGE_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Late,-0.6561
+gobp::GOBP_RIBOSOMAL_SMALL_SUBUNIT_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Late,-0.6619
+gobp::GOBP_RIBOSOMAL_SUBUNIT_EXPORT_FROM_NUCLEUS,Cytoplasmic Ribosome — biogenesis,R403C,Late,0.7664
+gobp::GOBP_RIBOSOME_ASSEMBLY,Cytoplasmic Ribosome — biogenesis,R403C,Late,0.8221
+gobp::GOBP_RIBOSOME_BIOGENESIS,Cytoplasmic Ribosome — biogenesis,R403C,Late,0.6083
+gocc::GOCC_90S_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,R403C,Late,0.5760
+gocc::GOCC_PRERIBOSOME,Cytoplasmic Ribosome — biogenesis,R403C,Late,-0.7528
+gocc::GOCC_PRERIBOSOME_LARGE_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,R403C,Late,-0.9254
+gocc::GOCC_PRERIBOSOME_SMALL_SUBUNIT_PRECURSOR,Cytoplasmic Ribosome — biogenesis,R403C,Late,-0.8152
+gocc::GOCC_CYTOSOLIC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Early,1.9491
+gocc::GOCC_CYTOSOLIC_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Early,1.5895
+gocc::GOCC_CYTOSOLIC_SMALL_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Early,1.3512
+gocc::GOCC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Early,-0.7238
+gocc::GOCC_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Early,-0.9176
+gocc::GOCC_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Early,-1.0337
+gomf::GOMF_STRUCTURAL_CONSTITUENT_OF_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Early,-0.8435
+gocc::GOCC_CYTOSOLIC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Late,-2.4504
+gocc::GOCC_CYTOSOLIC_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Late,-2.4277
+gocc::GOCC_CYTOSOLIC_SMALL_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Late,-1.9173
+gocc::GOCC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Late,-2.2353
+gocc::GOCC_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,G32A,Late,-2.2764
+gocc::GOCC_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Late,-2.2743
+gomf::GOMF_STRUCTURAL_CONSTITUENT_OF_RIBOSOME,Cytoplasmic Ribosome — structural,G32A,Late,-2.4037
+gocc::GOCC_CYTOSOLIC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Early,1.6620
+gocc::GOCC_CYTOSOLIC_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Early,1.4013
+gocc::GOCC_CYTOSOLIC_SMALL_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Early,1.0789
+gocc::GOCC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Early,0.5026
+gocc::GOCC_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Early,-0.5218
+gocc::GOCC_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Early,-0.4798
+gomf::GOMF_STRUCTURAL_CONSTITUENT_OF_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Early,0.5488
+gocc::GOCC_CYTOSOLIC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Late,-2.4544
+gocc::GOCC_CYTOSOLIC_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Late,-2.5096
+gocc::GOCC_CYTOSOLIC_SMALL_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Late,-2.0038
+gocc::GOCC_LARGE_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Late,-1.7362
+gocc::GOCC_RIBOSOMAL_SUBUNIT,Cytoplasmic Ribosome — structural,R403C,Late,-1.7607
+gocc::GOCC_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Late,-1.7724
+gomf::GOMF_STRUCTURAL_CONSTITUENT_OF_RIBOSOME,Cytoplasmic Ribosome — structural,R403C,Late,-1.9832
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome_assembly,Mitochondrial Ribosome — biogenesis,G32A,Early,-1.9875
+gobp::GOBP_MITOCHONDRIAL_RIBOSOME_ASSEMBLY,Mitochondrial Ribosome — biogenesis,G32A,Early,-1.9033
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome_assembly,Mitochondrial Ribosome — biogenesis,G32A,Late,0.8468
+gobp::GOBP_MITOCHONDRIAL_RIBOSOME_ASSEMBLY,Mitochondrial Ribosome — biogenesis,G32A,Late,-0.7650
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome_assembly,Mitochondrial Ribosome — biogenesis,R403C,Early,-1.8912
+gobp::GOBP_MITOCHONDRIAL_RIBOSOME_ASSEMBLY,Mitochondrial Ribosome — biogenesis,R403C,Early,-1.6539
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome_assembly,Mitochondrial Ribosome — biogenesis,R403C,Late,1.2873
+gobp::GOBP_MITOCHONDRIAL_RIBOSOME_ASSEMBLY,Mitochondrial Ribosome — biogenesis,R403C,Late,1.1949
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome,Mitochondrial Ribosome — structural,G32A,Early,-2.1836
+gocc::GOCC_MITOCHONDRIAL_LARGE_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,G32A,Early,-1.8811
+gocc::GOCC_MITOCHONDRIAL_SMALL_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,G32A,Early,-1.8245
+gocc::GOCC_ORGANELLAR_RIBOSOME,Mitochondrial Ribosome — structural,G32A,Early,-2.1876
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome,Mitochondrial Ribosome — structural,G32A,Late,-1.4315
+gocc::GOCC_MITOCHONDRIAL_LARGE_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,G32A,Late,-1.3575
+gocc::GOCC_MITOCHONDRIAL_SMALL_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,G32A,Late,-0.9790
+gocc::GOCC_ORGANELLAR_RIBOSOME,Mitochondrial Ribosome — structural,G32A,Late,-1.3001
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome,Mitochondrial Ribosome — structural,R403C,Early,-1.6318
+gocc::GOCC_MITOCHONDRIAL_LARGE_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,R403C,Early,-1.4901
+gocc::GOCC_MITOCHONDRIAL_SMALL_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,R403C,Early,-1.4727
+gocc::GOCC_ORGANELLAR_RIBOSOME,Mitochondrial Ribosome — structural,R403C,Early,-1.6916
+MitoCarta::Mitochondrial_central_dogma.Translation.Mitochondrial_ribosome,Mitochondrial Ribosome — structural,R403C,Late,1.0475
+gocc::GOCC_MITOCHONDRIAL_LARGE_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,R403C,Late,0.7595
+gocc::GOCC_MITOCHONDRIAL_SMALL_RIBOSOMAL_SUBUNIT,Mitochondrial Ribosome — structural,R403C,Late,1.2668
+gocc::GOCC_ORGANELLAR_RIBOSOME,Mitochondrial Ribosome — structural,R403C,Late,1.1330
+SynGO::SYNGO:postsyn_ribosome,Synaptic Ribosome,G32A,Early,2.4582
+SynGO::SYNGO:presyn_ribosome,Synaptic Ribosome,G32A,Early,2.3301
+SynGO::SYNGO:postsyn_ribosome,Synaptic Ribosome,G32A,Late,-2.4850
+SynGO::SYNGO:presyn_ribosome,Synaptic Ribosome,G32A,Late,-2.4924
+SynGO::SYNGO:postsyn_ribosome,Synaptic Ribosome,R403C,Early,2.2916
+SynGO::SYNGO:presyn_ribosome,Synaptic Ribosome,R403C,Early,2.2332
+SynGO::SYNGO:postsyn_ribosome,Synaptic Ribosome,R403C,Late,-2.5815
+SynGO::SYNGO:presyn_ribosome,Synaptic Ribosome,R403C,Late,-2.4775

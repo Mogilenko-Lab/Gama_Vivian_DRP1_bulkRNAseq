@@ -1,0 +1,15 @@
+FDR_threshold	metric	count
+0.05	Time_Ctrl	0
+0.05	Time_G32A	68
+0.05	Time_R403C	124
+0.05	G32A∩R403C	38
+0.05	G32A∩Ctrl	0
+0.05	R403C∩Ctrl	0
+0.05	three-way	0
+0.1	Time_Ctrl	1
+0.1	Time_G32A	376
+0.1	Time_R403C	503
+0.1	G32A∩R403C	213
+0.1	G32A∩Ctrl	1
+0.1	R403C∩Ctrl	1
+0.1	three-way	1
