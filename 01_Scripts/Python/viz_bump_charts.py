@@ -139,18 +139,27 @@ def load_data():
     return df
 
 def filter_by_scope(df, scope):
-    """Filter dataframe based on scope configuration."""
+    """Filter dataframe based on scope configuration.
+
+    Scopes
+    ------
+    focused : Curated MitoCarta + SynGO panels only (~104 unique pathways).
+    significant : Pathways ever-significant (p.adjust < 0.05) in any of the
+        9 GSEA contrasts. This is the manuscript-canonical denominator (5,267
+        unique pathways) carried directly from the `ever_significant` column
+        in master_gsea_table.csv. Includes Complex and Insufficient_data
+        pathways so that classification-unfriendly pathways remain inspectable
+        in the dashboard (rendered with the Insufficient_data gray).
+    """
     if scope == 'focused':
         return df[df['database'].isin(['MitoCarta', 'SynGO'])].copy()
     elif scope == 'significant':
-        # Filter for meaningful patterns only
-        patterns_to_show = [p for p in MEANINGFUL_PATTERNS if p != 'Complex']
-        sig_mask = pd.Series(False, index=df.index)
-        for mut in ['G32A', 'R403C']:
-            pattern_col = f'Pattern_{mut}'
-            if pattern_col in df.columns:
-                sig_mask |= df[pattern_col].isin(patterns_to_show)
-        return df[sig_mask].copy()
+        if 'ever_significant' not in df.columns:
+            raise KeyError(
+                "Column 'ever_significant' missing from master GSEA table; "
+                "regenerate it with 1.5.create_master_pathway_table.py."
+            )
+        return df[df['ever_significant'].fillna(False).astype(bool)].copy()
     return df.copy()
 
 def compute_weight_categories(df, mutations=['G32A', 'R403C']):

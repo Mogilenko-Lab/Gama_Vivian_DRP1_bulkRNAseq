@@ -248,13 +248,18 @@ def assign_semantic_category(row, exclude_pathways=None):
     # Must check BEFORE ribosome structure categories
     biogenesis_keywords = ['ribosome biogenesis', 'ribosomal subunit assembly',
                           'ribosome assembly', 'preribosome', 'rrna processing',
-                          'ribosomal rna', 'rrna metabol', 'gobp_ribosome_biogenesis']
+                          'ribosomal rna', 'rrna metabol', 'gobp_ribosome_biogenesis',
+                          'ribosomal_large_subunit_biogenesis',
+                          'ribosomal_small_subunit_biogenesis',
+                          'ribosomal_subunit_export']
     if any(kw in desc for kw in biogenesis_keywords):
         return 'Ribosome Biogenesis'
 
     # 8. Mitochondrial Ribosome (structure)
+    # Organellar ribosome is biologically the mitochondrial ribosome in
+    # mammalian gene sets (no plastid ribosomes), so it lives here.
     if 'ribosome' in desc or 'ribosomal' in desc:
-        if 'mitochondri' in desc or db == 'MitoCarta':
+        if 'mitochondri' in desc or 'organellar' in desc or db == 'MitoCarta':
             return 'Mitochondrial Ribosome'
 
     # 9. Mitochondrial Translation
