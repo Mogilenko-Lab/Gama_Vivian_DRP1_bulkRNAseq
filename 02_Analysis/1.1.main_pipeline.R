@@ -474,7 +474,8 @@ print(ggplot(deg_long,
   theme_minimal(base_size = 12) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid.major.x = element_blank()) +
-  labs(y = "gene count", x = NULL, fill = ""))
+  labs(title = sprintf("Differentially Expressed Genes (FDR < %s)", config$fdr_cutoff),
+       y = "gene count", x = NULL, fill = ""))
 dev.off()
 
 
