@@ -6,12 +6,15 @@
     "remoteUser": "devuser",
     "updateRemoteUserUID": true,
     "shutdownAction": "stopCompose",
-
+    "containerEnv": {
+        // Bridges the container to the Host OS Ollama service
+        "OLLAMA_HOST": "http://172.17.0.1:11434"
+    },
     // ──────────────────────  VS Code settings  ──────────────────────
     "settings": {
+        "python.terminal.activateEnvironment": false,
         "files.watcherExclude": {
             "**/00_Data/**": true,
-            "**/03_Results/**": true,
             "**/*.fq.gz": true,
             "**/*.bam": true,
             "**/*.html": true,
@@ -19,7 +22,6 @@
         },
         "search.exclude": {
             "**/00_Data/**": true,
-            "**/03_Results/**": true,
             "**/*.fq.gz": true,
             "**/*.bam": true,
             "**/*.html": true,
@@ -45,5 +47,6 @@
       ]
     }
   },
-  "postStartCommand": "bash -lc 'chmod +x .devcontainer/scripts/poststart_sanity.sh && .devcontainer/scripts/poststart_sanity.sh'"
+  "postStartCommand": "bash -lc 'chmod +x .devcontainer/scripts/poststart_sanity.sh && .devcontainer/scripts/poststart_sanity.sh'",
+  "postCreateCommand": "bash -lc 'chmod +x .devcontainer/scripts/setup_pi.sh && .devcontainer/scripts/setup_pi.sh'"
 }

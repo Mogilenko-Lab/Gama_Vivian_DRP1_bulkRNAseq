@@ -1,17 +1,22 @@
 # Dev container environment
 .devcontainer/.env
 .devcontainer/devcontaine.back.json
-.claude/*
 1stRun.backup/*
 .gitignore
-CLAUDE.md
-AGENT.md
 NEXT_SESSION*
 SESSION_SUMMARY*
+
+.pytest_cache
+__pycache__
+
+# AI-specs
+CLAUDE.md
+GEMINI.md
 .env
 .mcp.json
-.gemini/
-docs/TIME_CTRL_CONTEXT.md
+.claude/*
+.gemini/*
+.devcontainer/scripts/setup_pi.sh
 
 
 # R specific
@@ -50,8 +55,10 @@ Thumbs.db
 *.cache
 docs/.ref/*
 03_Results/02_Analysis/Explorer/
+docs/TIME_CTRL_CONTEXT.md
+Manuscript/
 
-# Large data files (optional - uncomment if needed)
+# Large data files
 # *.fastq
 # *.fastq.gz
 # *.bam
@@ -59,3 +66,6 @@ docs/.ref/*
 # *.fasta
 # *.fa
 test/
+node_modules/
+package-lock.json
+package.json
