@@ -7,10 +7,23 @@
 ##  SCOPE:   - All MSigDB collections (Hallmark, KEGG, Reactome, GO, etc.)   ##
 ##           - MitoCarta pathways                                            ##
 ##           - SynGO pathways                                                ##
-##           - ~12,000 pathways total                                        ##
+##           - ~14,500 pathways total (post size-filter)                     ##
 ##                                                                            ##
 ##  OUTPUTS: - master_gsva_all_table.csv (comprehensive GSVA table)          ##
 ##           - gsva_all_pathways_checkpoint.rds (for reuse)                  ##
+##                                                                            ##
+##  GENE-SET SOURCE OF TRUTH                                                  ##
+##  -------------------------                                                ##
+##  Gene sets are loaded from the GSEA result checkpoints, NOT from msigdbr ##
+##  or upstream Excel/GMT files. Reason: msigdbr changed its API and split  ##
+##  KEGG between version 7.x and 10.x (and SynGO's GO-ID-vs-name divergence ##
+##  is another source of mismatch). Loading from the GSEA checkpoints       ##
+##  guarantees that the GSVA pathway_id universe equals the GSEA universe   ##
+##  by construction, so dashboard click-through modals can always join GSVA ##
+##  scores onto every dashboard record. See freeze_requirements.R for the   ##
+##  full rationale. If the checkpoints are missing, fall back to            ##
+##  re-running the GSEA pipeline first; do NOT swap in a fresh msigdbr      ##
+##  load here.                                                              ##
 ###############################################################################
 
 library(here)
@@ -44,7 +57,7 @@ config <- list(
   species = "Homo sapiens",
 
   # Force recompute
-  force_recompute_gsva = FALSE
+  force_recompute_gsva = TRUE
 )
 
 # ============================================================================ #
@@ -74,148 +87,103 @@ message(sprintf("  ✓ Expression matrix: %d genes × %d samples",
 # ============================================================================ #
 # 2. Load All Gene Sets                                                       #
 # ============================================================================ #
+#
+# The dashboard's source of truth is the GSEA universe. Earlier versions of
+# this script independently loaded MSigDB / MitoCarta / SynGO from upstream
+# files; that path diverged from the GSEA universe whenever the env's msigdbr
+# version differed from the one used to produce the GSEA checkpoint (e.g.,
+# msigdbr 7.x has only "CP:KEGG" while msigdbr 10.x has "CP:KEGG_LEGACY" +
+# "CP:KEGG_MEDICUS", and SynGO IDs differ between term names and GO IDs).
+#
+# To guarantee the GSVA pathway_id set matches master_gsea_table.csv exactly,
+# we reuse the gene-set lists embedded in the GSEA result checkpoints, which
+# were produced by the same upstream pipeline that built the master table.
+# Each `gseaResult` object carries an `@geneSets` slot — a named list of
+# character vectors with the canonical pathway IDs as names.
 
-message("\n🧬 Loading gene sets from all databases...")
+message("\n🧬 Loading gene sets from GSEA checkpoints (canonical universe)...")
 
 all_gene_sets <- list()
 gene_set_metadata <- data.frame()
 
-# --- MSigDB Collections ---
+gsea_main_ck     <- readRDS(file.path(config$checkpoint_dir, "all_gsea_results.rds"))
+mitocarta_ck     <- readRDS(file.path(config$checkpoint_dir, "mitocarta_gsea_results.rds"))
+syngo_ck         <- readRDS(file.path(config$checkpoint_dir, "syngo_gsea_results.rds"))
 
-msigdb_collections <- list(
-  hallmark = "H",
-  kegg = "C2",  # Will filter to KEGG
-  reactome = "C2",  # Will filter to REACTOME
-  canon = "C2",  # Will filter to CP
-  gobp = "C5",  # Will filter to GO:BP
-  gocc = "C5",  # Will filter to GO:CC
-  gomf = "C5",  # Will filter to GO:MF
-  cgp = "C2",  # Will filter to CGP
-  tf = "C3",  # TF targets
-  wiki = "C2"   # Will filter to WIKIPATHWAYS
-)
-
-for (db_name in names(msigdb_collections)) {
-  message(sprintf("\n  Loading %s...", db_name))
-
-  collection <- msigdb_collections[[db_name]]
-
-  # Get all gene sets for this collection
-  m_df <- msigdbr(species = config$species, collection = collection)
-
-  # Filter by subcategory if needed
-  if (db_name == "kegg") {
-    m_df <- m_df %>% filter(gs_subcollection == "CP:KEGG")
-  } else if (db_name == "reactome") {
-    m_df <- m_df %>% filter(gs_subcollection == "CP:REACTOME")
-  } else if (db_name == "canon") {
-    m_df <- m_df %>% filter(gs_subcollection == "CP")
-  } else if (db_name == "gobp") {
-    m_df <- m_df %>% filter(gs_subcollection == "GO:BP")
-  } else if (db_name == "gocc") {
-    m_df <- m_df %>% filter(gs_subcollection == "GO:CC")
-  } else if (db_name == "gomf") {
-    m_df <- m_df %>% filter(gs_subcollection == "GO:MF")
-  } else if (db_name == "cgp") {
-    m_df <- m_df %>% filter(gs_subcollection == "CGP")
-  } else if (db_name == "wiki") {
-    m_df <- m_df %>% filter(gs_subcollection == "CP:WIKIPATHWAYS")
+# Each GSEA checkpoint is a per-contrast list of gseaResult objects; we just
+# need the gene-set library, which is shared across contrasts.
+.first_gsea_genesets <- function(ck) {
+  for (i in seq_along(ck)) {
+    obj <- ck[[i]]
+    if (inherits(obj, "gseaResult") && length(obj@geneSets) > 0) return(obj@geneSets)
   }
+  NULL
+}
 
-  # Convert to named list
-  gene_sets <- m_df %>%
-    split(.$gs_name) %>%
-    lapply(function(x) x$gene_symbol)
+# --- MSigDB collections (10 DBs, multi-contrast checkpoint) ---
+msigdb_dbs <- c("hallmark", "canon", "gobp", "gomf", "gocc",
+                "kegg", "reactome", "wiki", "cgp", "tf")
 
-  # Add to collection
+contrast_name <- names(gsea_main_ck)[1]
+message(sprintf("  Source contrast: %s", contrast_name))
+
+for (db_name in msigdb_dbs) {
+  gs_obj <- gsea_main_ck[[contrast_name]][[db_name]]
+  if (is.null(gs_obj) || !inherits(gs_obj, "gseaResult")) {
+    message(sprintf("    ⚠ %s — no gseaResult found in checkpoint; skipping", db_name))
+    next
+  }
+  gene_sets <- gs_obj@geneSets
   all_gene_sets[[db_name]] <- gene_sets
 
-  # Track metadata
-  for (gs_name in names(gene_sets)) {
-    gene_set_metadata <- rbind(gene_set_metadata, data.frame(
-      pathway_id = paste0(db_name, "::", gs_name),
-      database = db_name,
-      pathway_name = gs_name,
-      n_genes_total = length(gene_sets[[gs_name]]),
-      stringsAsFactors = FALSE
-    ))
-  }
-
-  message(sprintf("    ✓ %d pathways loaded", length(gene_sets)))
+  gene_set_metadata <- rbind(gene_set_metadata, data.frame(
+    pathway_id = paste0(db_name, "::", names(gene_sets)),
+    database = db_name,
+    pathway_name = names(gene_sets),
+    n_genes_total = vapply(gene_sets, length, integer(1)),
+    stringsAsFactors = FALSE
+  ))
+  message(sprintf("    ✓ %-9s %5d sets from checkpoint", db_name, length(gene_sets)))
 }
 
 # --- MitoCarta ---
-
-message("\n  Loading MitoCarta...")
-source(here("01_Scripts/R_scripts/parse_mitocarta_gmx.R"))
-mitocarta_lists <- mitocarta_gmt(config$mitocarta_file)
-T2G <- mitocarta_lists$T2G
-
-mitocarta_sets <- T2G %>%
-  split(.$gs_name) %>%
-  lapply(function(x) unique(x$gene_symbol))
-
-all_gene_sets[["MitoCarta"]] <- mitocarta_sets
-
-for (gs_name in names(mitocarta_sets)) {
+mc_sets <- .first_gsea_genesets(mitocarta_ck)
+if (!is.null(mc_sets)) {
+  all_gene_sets[["MitoCarta"]] <- mc_sets
   gene_set_metadata <- rbind(gene_set_metadata, data.frame(
-    pathway_id = paste0("MitoCarta::", gs_name),
+    pathway_id = paste0("MitoCarta::", names(mc_sets)),
     database = "MitoCarta",
-    pathway_name = gs_name,
-    n_genes_total = length(mitocarta_sets[[gs_name]]),
+    pathway_name = names(mc_sets),
+    n_genes_total = vapply(mc_sets, length, integer(1)),
     stringsAsFactors = FALSE
   ))
+  message(sprintf("    ✓ %-9s %5d sets from checkpoint", "MitoCarta", length(mc_sets)))
 }
-
-message(sprintf("    ✓ %d pathways loaded", length(mitocarta_sets)))
 
 # --- SynGO ---
-
-message("\n  Loading SynGO...")
-source(here("01_Scripts/R_scripts/run_syngo_gsea.R"))
-
-# Load SynGO data
-syngo_genes <- readxl::read_excel(file.path(config$syngo_dir, "syngo_genes.xlsx"))
-syngo_ontologies <- readxl::read_excel(file.path(config$syngo_dir, "syngo_ontologies.xlsx"))
-syngo_annotations <- readxl::read_excel(file.path(config$syngo_dir, "syngo_annotations.xlsx"))
-
-# Build SynGO gene sets
-syngo_sets <- list()
-
-for (i in 1:nrow(syngo_ontologies)) {
-  term_id <- syngo_ontologies$id[i]
-  term_name <- syngo_ontologies$name[i]
-
-  # Get genes for this term
-  term_genes <- syngo_annotations %>%
-    filter(hgnc_id %in% syngo_ontologies$id[i]) %>%
-    pull(hgnc_symbol) %>%
-    unique()
-
-  if (length(term_genes) > 0) {
-    syngo_sets[[term_name]] <- term_genes
-  }
-}
-
-all_gene_sets[["SynGO"]] <- syngo_sets
-
-for (gs_name in names(syngo_sets)) {
+syngo_sets <- .first_gsea_genesets(syngo_ck)
+if (!is.null(syngo_sets)) {
+  all_gene_sets[["SynGO"]] <- syngo_sets
   gene_set_metadata <- rbind(gene_set_metadata, data.frame(
-    pathway_id = paste0("SynGO::", gs_name),
+    pathway_id = paste0("SynGO::", names(syngo_sets)),
     database = "SynGO",
-    pathway_name = gs_name,
-    n_genes_total = length(syngo_sets[[gs_name]]),
+    pathway_name = names(syngo_sets),
+    n_genes_total = vapply(syngo_sets, length, integer(1)),
     stringsAsFactors = FALSE
   ))
+  message(sprintf("    ✓ %-9s %5d sets from checkpoint", "SynGO", length(syngo_sets)))
 }
-
-message(sprintf("    ✓ %d pathways loaded", length(syngo_sets)))
 
 # --- Summary ---
 
 total_gene_sets <- sum(sapply(all_gene_sets, length))
 message(sprintf("\n✓ Total gene sets loaded: %d from %d databases",
                 total_gene_sets, length(all_gene_sets)))
+
+message("\n  Per-database sets loaded:")
+for (db in names(all_gene_sets)) {
+  message(sprintf("    %-12s %5d sets", db, length(all_gene_sets[[db]])))
+}
 
 # ============================================================================ #
 # 3. Filter Gene Sets by Size and Expression                                  #
@@ -259,6 +227,17 @@ gene_set_metadata <- gene_set_metadata %>%
 message(sprintf("  ✓ Valid gene sets: %d/%d (size %d-%d, genes in expression matrix)",
                 sum(valid_sets), length(all_gene_sets_flat),
                 config$minSize, config$maxSize))
+
+message("\n  Per-database passed-filter counts:")
+passed_by_db <- gene_set_metadata %>%
+  group_by(database) %>%
+  summarise(loaded = n(), passed = sum(passed_filter), .groups = "drop")
+for (i in seq_len(nrow(passed_by_db))) {
+  message(sprintf("    %-12s %5d / %5d passed",
+                  passed_by_db$database[i],
+                  passed_by_db$passed[i],
+                  passed_by_db$loaded[i]))
+}
 
 # ============================================================================ #
 # 4. Run GSVA                                                                  #
