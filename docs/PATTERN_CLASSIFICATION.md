@@ -263,6 +263,71 @@ This pattern classification system is **descriptive**, not inferential. Patterns
 
 Claims about pathway trajectories will need validation, and would need to show the underlying trajectory data to allow visual verification.
 
+**Critical interpretive caveat:** Pattern labels are descriptive of the **interaction contrast**, not of the **replicate-level dynamics**. The same GSEA pattern label can carry different biological meanings across pathway buckets. Specifically, *Compensation* in the interaction contrast can correspond either to a genuine mutant rebound (both arms moving toward each other at the per-sample level) or to a closing-gap artefact in which the Ctrl arm descends to meet a flat mutant baseline. The companion **GSVA driver classification** (next section) names this mechanism explicitly.
+
+---
+
+## GSVA Driver Classification (Companion Layer)
+
+The trajectory-pattern taxonomy above is a contrast-level summary. To resolve which experimental arm is responsible for a given trajectory change, we compute a per-replicate GSVA score for every pathway × sample, summarise the arm-level deltas, and emit a four-state driver label. This layer is implemented in `02_Analysis/1.6.gsva_analysis.R`, surfaced in the interactive dashboard (`Supplementary Data File 1`), and printed as a sidebar filter and click-through verdict in the bump-chart explorer.
+
+### Driver labels
+
+| Driver label | Δ_mutant | Δ_ctrl | Interpretation |
+|---|---|---|---|
+| **`mutant_driven`** | \|Δ\| ≥ 0.10 | \|Δ\| < 0.10 | Mutant arm moves; control flat. The trajectory change reflects an active mutant transcriptional response. |
+| **`ctrl_driven`** | \|Δ\| < 0.10 | \|Δ\| ≥ 0.10 | Control arm moves; mutant flat. The contrast-level pattern is a closing-gap artefact of normal Ctrl developmental change. |
+| **`both_moving`** | \|Δ\| ≥ 0.10 | \|Δ\| ≥ 0.10 | Both arms move. Required for a genuine per-sample crossover (Sign_reversal at the contrast level). |
+| **`neither_moving`** | \|Δ\| < 0.10 | \|Δ\| < 0.10 | Both arms flat at the per-sample level. The contrast-level signature is either small or driven by within-arm variance. |
+
+Where `Δ = median(D65) − median(D35)` per genotype, computed on the per-replicate GSVA scores. Threshold |Δ| ≥ 0.10 matches the `GSVA_EFFECT` minimum-effect criterion defined above (NES 0.5 ≈ GSVA 0.15; we use a slightly more permissive 0.10 here because the driver test is a difference of medians, not an enrichment magnitude).
+
+### Worked examples from the manuscript
+
+| Module | GSEA pattern (contrast) | GSVA driver (replicate) | Reading |
+|---|---|---|---|
+| **Synaptic_Ribosomes** | Sign_reversal | `both_moving` | Mutants fall from +0.18 → −0.06 (G32A) while Ctrl rises −0.19 → +0.21. Genuine per-sample crossover — the "synaptic ribosome crisis" is a real biological event. |
+| **Cytoplasmic_Translation** | Sign_reversal | `both_moving` | Same crossover signature as Synaptic_Ribosomes; the SynGO-localised pool sits at the amplitude extreme of this broader cytoplasmic collapse. |
+| **Ribosome_Biogenesis** | Compensation | `ctrl_driven` | Ctrl descends +0.56 → −0.18; mutant samples stay flat (G32A: −0.28 → −0.15). The "DOWN-then-UP" contrast arc is gap-closure, not mutant recovery. |
+| **Mitochondrial_Ribosome** | Compensation | `ctrl_driven` | Ctrl descends +0.32 → −0.17 while mutants drift flat or further negative. Contrast-level Compensation is a Ctrl-descent artefact. |
+| **Mito_Ribosome_Assembly** | Compensation | `ctrl_driven` | Ctrl +0.43 → −0.30; mutants flat. Same closing-gap signature as Mito_Ribosome. |
+| **mtDNA_Maintenance** | Compensation | `ctrl_driven` | Ctrl +0.46 → −0.26; mutants flat. |
+| **OXPHOS** | Compensation | `ctrl_driven` | Same pattern as the other mitochondrial modules — bulk mitochondrial gene programmes are not actively rebounding. |
+
+### When the distinction matters
+
+- For **`both_moving` Compensation / Sign_reversal** the contrast-level pattern label is sufficient — the GSVA view simply confirms a genuine mutant adaptive response.
+- For **`ctrl_driven` Compensation** the contrast-level label can mislead: the mutant baseline is not climbing; the Ctrl baseline is descending to meet a persistent mutant deficit. In the manuscript we cite the GSVA view (Supplementary Fig. S10) anywhere the arm-level distinction matters for interpretation.
+- For **`neither_moving`** patterns, the contrast-level signature is likely small enough that the pattern label conveys little biological information.
+
+### Implementation pointers
+
+- GSVA scores: `02_Analysis/1.6.gsva_analysis.R` produces per-replicate scores cached under `03_Results/02_Analysis/checkpoints/gsva_*.rds`.
+- Driver classification: surfaced in the interactive dashboard's sidebar (`Supplementary Data File 1`); the click-through modal for each pathway prints the verdict block alongside the per-replicate plot.
+- Master GSVA table: `Tables/master_gsva_focused_table.csv` (focused 7-module table) and `master_gsva_all_table.csv` (comprehensive) include the driver labels.
+
+---
+
+## 81-Combination Threshold-Sensitivity Analysis
+
+Because the pattern classifier depends on multiple thresholds (FDR cutoff, |NES| minimum, |Late|/|Early| improvement/worsening ratios), we ran a sensitivity sweep across 81 combinations on the same 5,267 ever-significantly-enriched pathway universe used in the main text. The output digest lives at:
+
+```
+03_Results/02_Analysis/Supplementary/6a_sensitivity_stability_digest_5267universe.tsv
+```
+
+### Key results
+
+- **Compensation > passive recovery (Natural_improvement + Natural_worsening)** in **81/81** combinations for both G32A and R403C.
+- **Progressive absent** (0 pathways) in **81/81** combinations for both mutations.
+- **R403C carries more Compensation than G32A** in **81/81** combinations.
+- In G32A, Compensation constitutes a strict majority (>50%) of classifiable pathways under every combination (range 54.5–58.5%).
+- In R403C, Compensation constitutes a strict majority under 54 of 81 combinations (range 46.9–54.5%) and a plurality under the remaining 27, with Natural_improvement (range 25.0–37.3%) the dominant non-Complex alternative under the more lenient combinations.
+
+### Conclusion
+
+The qualitative claims drawn from the 8-pattern taxonomy — "active opposition dominates passive recovery", "amplifying responses are essentially absent", "R403C mounts more Compensation than G32A" — are robust to threshold choice and do not depend on the specific default values quoted above.
+
 ---
 
 ## Methods Section Template
@@ -279,6 +344,7 @@ Claims about pathway trajectories will need validation, and would need to show t
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-05-14 | 2.1 | Added GSVA driver classification companion layer (`mutant_driven` / `ctrl_driven` / `both_moving` / `neither_moving`); added interpretive caveat that pattern labels describe the interaction contrast, not the replicate-level dynamics; added 81-combination sensitivity-analysis section; added worked-example table linking GSEA patterns to GSVA driver labels for the seven manuscript modules. |
 | 2025-12-01 | 2.0 | Added Sign_reversal pattern (8-pattern system); added Complex subtypes; added Active_Reversal super-category |
 | 2025-11-26 | 1.1 | Added super-category system; added descriptive classification note |
 | 2025-11-26 | 1.0 | Initial canonical definitions with significance requirements |
@@ -286,4 +352,4 @@ Claims about pathway trajectories will need validation, and would need to show t
 ---
 
 **Canonical Source:** `01_Scripts/Python/pattern_definitions.py`
-**Last Updated:** 2025-12-01
+**Last Updated:** 2026-05-14

@@ -53,7 +53,7 @@
 When writing or refactoring Python scripts in `02_Analysis/`:
 
 - **Extract** lambdas, nested `def`s, and ad-hoc inline logic into their own top-level `def func_name(...)`. Each function should have its own ``"""docstring"""`` and be placed in a clearly labeled section of the file (e.g., `# == Low-level helpers`, `# ==== High-level orchestration`).
-- **`main()` should be a thin orchestrator** - it reads config/ data, calls helpers, and writes outputs. No business logic belongs inline in the `if __name__ == "__main__":` guard or `main()`.  
+- **`main()` should be a thin orchestrator** - it reads config/ data, calls helpers, and writes outputs. No domain logic belongs inline in the `if __name__ == "__main__":` guard or `main()`.  
 - **`_-prefixed` names are "private to the module" and **should appear _after_ `main()`** in the source file to make the public API surface immediately visible to the reader.  
 
 Anti-pattern:
@@ -74,25 +74,13 @@ def main():  # thin orchestrator
     _inline_helper(data)
 ```
 
-## 4. Directory Structure & Architecture
-
-The project follows a **5-Phase Workflow**:
-
-| Phase | Description | Key Scripts | Key Outputs |
-|-------|-------------|-------------|-------------|
-| **1** | Core Analysis (DE, GSEA)| `02_Analysis/1.x.*.R` | `checkpoints/*.rds` |
-| **2** | Master Tables | `02_Analysis/2.x.*.R` | `tables/master_*.csv` |
-| **3** | R Visualization | `02_Analysis/3.x.*.R` | `plots/` |
-| **4** | Python Visualization | `02_Analysis/4.x.*.py`| `plots/Publication/` |
-| **5** | Interactive Dashboards| `02_Analysis/5.x.*` | `interactive/` |
-
 **Key Locations:**
 - `00_Data/`: Input data (read-only)
 - `01_Scripts/`: Shared code (RNAseq-toolkit, R_scripts helper functions)
 - `02_Analysis/`: Project-specific scripts and execution pipelines
 - `03_Results/`: All outputs (checkpoints, tables, plots)
 
-## 5. Configuration System
+## 4. Configuration System
 
 All hardcoded values/thresholds go in configuration files, usually referenced centrally:
 **Importing Config in R:**

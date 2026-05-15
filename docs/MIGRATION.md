@@ -45,7 +45,7 @@ This document describes the migration of the GVDRP1 bulk RNA-seq analysis reposi
 - All analysis scripts now use workspace-relative paths
 
 **Git Submodule Update:**
-- RNAseq-toolkit submodule path updated from old location to `/data1/users/antonz/pipeline/RNAseq-toolkit`
+- RNAseq-toolkit submodule path updated
 - Submodule now properly initialized and accessible
 
 #### 3. Documentation Enhancements
@@ -192,13 +192,4 @@ list.files(here::here("03_Results/01_Preprocessing/04_FeatureCounts/count_matric
 ## References
 
 - **Original Analysis:** Git tag `v1.0`
-- **Container Documentation:** See test/test/README.md for modern dev container template
-- **RNAseq-toolkit:** https://github.com/tony-zhelonkin/RNAseq-toolkit (if public)
-
-## Contact
-
-For questions about the migration or repository setup:
-- Anton Zhelonkin <anton.bioinf.md@gmail.com> / <antonz@uchicago.edu>
-
----
-*Migration completed: 2025-11-19*
+- **RNAseq-toolkit:** https://github.com/tony-zhelonkin/RNAseq-toolkit 
