@@ -1,11 +1,8 @@
-# 03_Results/02_Analysis/Supplementary — paper-supplement digests and supporting tables
+# 03_Results/02_Analysis/Supplementary — reviewer-response digests and expression-filter audits
 
 ## Overview
 
-Compact CSV / TSV artifacts produced by reviewer-response work, intended to be cited
-verbatim from manuscript supplementary text or figure legends. This pass (2026-04-24)
-documents the **concern-6a** entries fully; entries from other concerns (5a, 5b, 6c) are
-listed at filename level only.
+Compact CSV / TSV artifacts produced during reviewer-response work, intended to be cited verbatim from supplementary text or figure legends. The 6a sensitivity digests confirm that the key finding — Compensation > passive recovery in 81/81 threshold combinations — holds regardless of classifier parameterisation. The 5a files audit the `AveExpr > 0` expression filter impact on calcium gene visibility. The 5b, 6c files support UpSet/Euler and ribosome-scope claims respectively.
 
 ## Files (concern 6a — fully documented)
 
@@ -40,15 +37,23 @@ See [`../Tables/README_pattern_summary_denominators.md`](../Tables/README_patter
 
 | File | Concern | Generator |
 |---|---|---|
-| `5a_aveexpr_calcium_genes.csv` | 5a (expression filter) | `02_Analysis/5a.filtered_volcano_supplement.R` (and related 5a scripts) |
-| `5a_aveexpr_diagnostics.csv` | 5a | same |
-| `5a_aveexpr_filter_impact.csv` | 5a | same |
-| `5b_intersection_counts.tsv` | 5b (UpSet/Venn/Euler) | `02_Analysis/5b.highlighted_upset.R` / `5b.maturation_euler.R` |
-| `6c_cytoplasmic_ribo_nes.csv` | 6c (ribosome scope) | `02_Analysis/6c.extract_cyto_ribo_nes.py` |
-| `6c_ribosome_jaccard.csv` | 6c | `02_Analysis/6c.compute_jaccard.py` |
+| `5a_aveexpr_diagnostics.csv` | 5a — AveExpr filter impact per contrast | `02_Analysis/revision/supplements/5a.filtered_volcano_supplement.R` |
+| `5a_aveexpr_calcium_genes.csv` | 5a — per-gene AveExpr values for the 13 calcium genes | same |
+| `5a_aveexpr_filter_impact.csv` | 5a — gene counts before/after AveExpr > 0 filter | same |
+| `5b_intersection_counts.tsv` | 5b — DEG intersection counts for UpSet/Euler plots | `02_Analysis/revision/supplements/5b.highlighted_upset.R` / `5b.maturation_euler.R` |
+| `6c_cytoplasmic_ribo_nes.csv` | 6c — NES values for cytoplasmic ribosome pathways | `02_Analysis/revision/supplements/6c.extract_cyto_ribo_nes.py` |
+| `6c_ribosome_jaccard.csv` | 6c — pairwise Jaccard between ribosome compartments | `02_Analysis/revision/supplements/6c.compute_jaccard.py` |
 
-For full provenance of these, see the corresponding concern docs in
-`Manuscript/current_submission/docs/{5a,5b,6c}_*/`.
+### Column dictionaries (5a files)
+
+**`5a_aveexpr_diagnostics.csv`** — one row per contrast:
+`contrast`, `n_total` (genes entering DE), `n_AveExpr_lt_0` (genes with AveExpr < 0), `pct_AveExpr_lt_0`, `n_AveExpr_lt_0p5`, `n_AveExpr_lt_1`, `AveExpr_min/max`, `n_sig_FDR05` (significant genes at FDR 0.05), `n_sig_FDR05_AveExpr_le_0` (significant genes that would be removed by the filter).
+
+**`5a_aveexpr_calcium_genes.csv`** — one row per (contrast × calcium gene):
+`contrast`, `gene`, `AveExpr`, `logFC`, `P.Value`, `adj.P.Val`, `passes_AveExpr_gt_0` (TRUE/FALSE — whether the gene survives the expression filter).
+
+**`5a_aveexpr_filter_impact.csv`** — one row per contrast:
+`contrast`, `n_before`, `n_after`, `n_removed`, `pct_removed` (fraction of genes removed by the AveExpr > 0 filter; ~28% of genes on average have AveExpr < 0 and would be excluded).
 
 ## Cross-references
 
