@@ -122,8 +122,8 @@ def create_normalized_pattern_summary(df_counts, show_annotations=True):
         print("  No meaningful patterns found")
         return None
 
-    # Create figure
-    fig, axes = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
+    # Create figure — sized for legibility at journal print scale
+    fig, axes = plt.subplots(1, 2, figsize=(14, 7), sharey=True)
 
     # Get databases
     databases = sorted(df_meaningful['Database'].unique())
@@ -170,16 +170,22 @@ def create_normalized_pattern_summary(df_counts, show_annotations=True):
             # Add annotations if requested
             if show_annotations:
                 for i, (width, count) in enumerate(zip(widths, pivot[pattern].values)):
-                    if width > 5:  # Only annotate if segment is large enough
-                        x_pos = left[i] + width / 2
-
-                        # Format: "Pattern: N (X%)"
-                        if count > 0:
+                    x_pos = left[i] + width / 2
+                    if count > 0:
+                        if width >= 13:
+                            # Two-line label fits comfortably
                             label = f'{int(count)}\n({width:.0f}%)'
                             ax.text(x_pos, i, label,
                                    ha='center', va='center',
-                                   fontsize=7, fontweight='bold',
-                                   color='white' if width > 15 else 'black')
+                                   fontsize=9, fontweight='bold',
+                                   color='white' if width > 20 else 'black')
+                        elif width >= 7:
+                            # Single-line count only
+                            label = f'{int(count)}'
+                            ax.text(x_pos, i, label,
+                                   ha='center', va='center',
+                                   fontsize=9, fontweight='bold',
+                                   color='white' if width > 20 else 'black')
 
             left += widths
 
@@ -187,24 +193,24 @@ def create_normalized_pattern_summary(df_counts, show_annotations=True):
         for i, (db, total) in enumerate(zip(databases, totals)):
             ax.text(101, i, f'n={int(total)}',
                    ha='left', va='center',
-                   fontsize=8, fontweight='bold',
+                   fontsize=11, fontweight='bold',
                    color=MUTATION_COLORS[mutation])
 
         # Formatting
         ax.set_yticks(x)
-        ax.set_yticklabels(databases, fontsize=10)
-        ax.set_xlabel('Proportion of Pathways (%)', fontsize=11)
-        ax.set_xlim(0, 115)  # Extra space for total annotations
+        ax.set_yticklabels(databases, fontsize=12)
+        ax.set_xlabel('Proportion of Pathways (%)', fontsize=13)
+        ax.set_xlim(0, 118)  # Extra space for total annotations
 
         ax.set_title(f'{mutation}',
-                    fontsize=14, fontweight='bold',
+                    fontsize=16, fontweight='bold',
                     color=MUTATION_COLORS[mutation])
 
         # Add vertical line at 50%
         ax.axvline(50, color='gray', linestyle='--', alpha=0.3, linewidth=1)
 
         if idx == 0:
-            ax.set_ylabel('Database', fontsize=11)
+            ax.set_ylabel('Database', fontsize=13)
 
     # Create shared legend
     legend_handles = [
@@ -213,26 +219,15 @@ def create_normalized_pattern_summary(df_counts, show_annotations=True):
     ]
     fig.legend(handles=legend_handles,
               loc='lower center', ncol=len(legend_handles),
-              fontsize=10, frameon=True, framealpha=0.9,
-              bbox_to_anchor=(0.5, -0.10))
+              fontsize=12, frameon=True, framealpha=0.9,
+              bbox_to_anchor=(0.5, -0.04))
 
     # Title
     fig.suptitle('Normalized Pattern Distribution (100% Stacked)\n'
                 'Each database scaled to 100% to show relative pattern proportions',
-                fontsize=14, fontweight='bold', y=0.98)
+                fontsize=15, fontweight='bold', y=0.99)
 
-    # Interpretation text
-    interpretation = (
-        'Note: Bars normalized to 100% per database. Absolute counts shown as "N (%)" inside bars.\n'
-        'Total pathways per database shown as "n=X" at right. Enables comparison of pattern proportions\n'
-        'across databases of different sizes (e.g., gobp with 5000 vs hallmark with 10 pathways).'
-    )
-    fig.text(0.5, 0.01, interpretation,
-            ha='center', va='bottom', fontsize=9, style='italic',
-            bbox=dict(boxstyle='round', facecolor='#FFF9E6',
-                     edgecolor='orange', alpha=0.8))
-
-    plt.tight_layout(rect=[0, 0.13, 1, 0.96])
+    plt.tight_layout(rect=[0, 0.10, 1, 0.96])
 
     return fig
 

@@ -116,7 +116,7 @@ def load_go_ribosome_genes():
         'RPL18', 'RPL18A', 'RPL19', 'RPL21', 'RPL22', 'RPL23', 'RPL23A', 'RPL24',
         'RPL26', 'RPL27', 'RPL27A', 'RPL28', 'RPL29', 'RPL30', 'RPL31', 'RPL32',
         'RPL34', 'RPL35', 'RPL35A', 'RPL36', 'RPL36A', 'RPL37', 'RPL37A', 'RPL38',
-        'RPL39', 'RPL40', 'RPL41', 'RPLP0', 'RPLP1', 'RPLP2',
+        'RPL39', 'UBA52', 'RPL41', 'RPLP0', 'RPLP1', 'RPLP2',  # UBA52 = HGNC-current symbol for the ubiquitin-RPL40 fusion (L40 protein)
         # Small subunit proteins (RPS family)
         'RPS2', 'RPS3', 'RPS3A', 'RPS4X', 'RPS4Y1', 'RPS5', 'RPS6', 'RPS7', 'RPS8',
         'RPS9', 'RPS10', 'RPS11', 'RPS12', 'RPS13', 'RPS14', 'RPS15', 'RPS15A',

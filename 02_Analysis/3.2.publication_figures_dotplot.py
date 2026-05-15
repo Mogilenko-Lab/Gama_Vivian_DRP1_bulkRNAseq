@@ -67,50 +67,43 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # HELPER FUNCTIONS
 # =============================================================================
 
-def add_size_legend_visual(ax, renderer, sig_cutoff=0.05):
+def add_size_legend_visual(ax, renderer, sig_cutoff=0.05,
+                           dot_label_fontsize=12, caption_fontsize=13,
+                           edge_fontsize=12):
     """
     Add a visual size legend showing the padj-to-size relationship.
 
-    Creates example dots at different significance levels with labels.
+    Layout (top to bottom):
+      dots row → padj numeric labels → "Larger dots = more significant" caption
+      → "Black edge / Gray edge" explanation
     """
     ax.axis('off')
 
-    # Define example padj values to show
     padj_values = [0.001, 0.01, 0.05, 0.1]
-    labels = ['highly sig', 'very sig', 'threshold', 'not sig']
 
-    # Calculate sizes using renderer's method (use actual sizes, not scaled)
     padj_array = np.array(padj_values).reshape(1, -1)
     dot_sizes = renderer._calculate_dot_sizes(padj_array)[0]
 
-    # Position dots horizontally with more space
     x_positions = np.linspace(0.15, 0.85, len(padj_values))
-    y_position = 0.5
+    y_dots = 0.78
 
-    # Draw dots with ACTUAL sizes from the renderer
-    for i, (x, size, padj, label) in enumerate(zip(x_positions, dot_sizes, padj_values, labels)):
-        # Determine edge color
+    for x, size, padj in zip(x_positions, dot_sizes, padj_values):
         edge_color = 'black' if padj < sig_cutoff else 'gray'
         edge_width = 2 if padj < sig_cutoff else 1
 
-        # Draw dot using ACTUAL calculated size
-        ax.scatter([x], [y_position], s=size, c='gray',
+        ax.scatter([x], [y_dots], s=size, c='gray',
                   edgecolors=edge_color, linewidths=edge_width,
                   alpha=0.7, zorder=3)
 
-        # Add label below with better spacing
-        ax.text(x, 0.28, f'padj = {padj}',
-               ha='center', va='top', fontsize=10, fontweight='bold')
-        ax.text(x, 0.15, f'({label})',
-               ha='center', va='top', fontsize=9, style='italic', color='#555')
+        ax.text(x, 0.52, f'padj = {padj}',
+               ha='center', va='top', fontsize=dot_label_fontsize, fontweight='bold')
 
-    # Add title at top
-    ax.text(0.5, 0.90, 'Dot Size Legend: Larger dots = more significant (lower padj)',
-           ha='center', va='center', fontsize=11, fontweight='bold')
+    ax.text(0.5, 0.28, 'Dot size legend: larger dots = more significant (lower padj)',
+           ha='center', va='center', fontsize=caption_fontsize, fontweight='bold')
 
-    # Add edge color explanation at bottom
-    ax.text(0.5, 0.02, 'Black edge = padj < 0.05 (significant)  |  Gray edge = padj ≥ 0.05 (not significant)',
-           ha='center', va='center', fontsize=9, style='italic')
+    ax.text(0.5, 0.08,
+           'Black edge = padj < 0.05 (significant)   |   Gray edge = padj ≥ 0.05 (not significant)',
+           ha='center', va='center', fontsize=edge_fontsize, style='italic')
 
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -760,6 +753,14 @@ def create_semantic_grouping_figure(df):
     df_plot = df_sig.groupby('Semantic_Category').head(max_per_category).reset_index(drop=True)
     print(f"  Pathways to plot (max {max_per_category} per category): {len(df_plot)}")
 
+    # Add explicit MitoCarta: prefix so MitoCarta-origin pathways are clearly
+    # distinguishable from GO/Reactome/etc. pathways in the y-axis labels.
+    df_plot = df_plot.copy()
+    mito_mask = df_plot['database'] == 'MitoCarta'
+    df_plot.loc[mito_mask, 'Description'] = df_plot.loc[mito_mask, 'Description'].apply(
+        lambda d: d if str(d).startswith('MitoCarta:') else f'MitoCarta: {d}'
+    )
+
     # Group pathways by category for separate dotplot blocks
     category_data = []
 
@@ -789,7 +790,7 @@ def create_semantic_grouping_figure(df):
 
     # Total figure height
     total_gap_height = (n_categories - 1) * GAP_FRACTION * ROW_HEIGHT * 3
-    fig_height = max(10, total_pathways * ROW_HEIGHT + total_gap_height + 6)  # +6 for legend and spacing
+    fig_height = max(10, total_pathways * ROW_HEIGHT + total_gap_height + 8)  # extra for legend/spacing
 
     # Create figure with GridSpec for true separation
     height_ratios = []
@@ -798,8 +799,10 @@ def create_semantic_grouping_figure(df):
         if i < len(category_heights) - 1:
             height_ratios.append(GAP_FRACTION * 3)
 
-    # Add legend row at the end
-    height_ratios.append(5)  # Legend height (increased to prevent overlap)
+    # Spacer row between the last plot's x-axis labels and the size legend
+    height_ratios.append(2.5)
+    # Legend row (taller so caption / edge-color line sit well below the plot)
+    height_ratios.append(7)
 
     n_grid_rows = len(height_ratios)
 
@@ -837,17 +840,17 @@ def create_semantic_grouping_figure(df):
 
         # Y-axis: pathway names
         ax.set_yticks(range(n_rows))
-        ax.set_yticklabels(pathway_names, fontsize=8)
+        ax.set_yticklabels(pathway_names, fontsize=11)
 
         # X-axis: only show labels on the last category
         ax.set_xticks(range(6))
         if cat_idx == len(category_data) - 1:
-            ax.set_xticklabels(col_labels, fontsize=9)
+            ax.set_xticklabels(col_labels, fontsize=12, fontweight='bold')
         else:
             ax.set_xticklabels([])
 
         # Category label at top-left
-        ax.text(-0.02, 1.1, cat, fontsize=11, fontweight='bold',
+        ax.text(-0.02, 1.1, cat, fontsize=15, fontweight='bold',
                 va='bottom', ha='left', color=color,
                 transform=ax.transAxes)
 
@@ -864,24 +867,25 @@ def create_semantic_grouping_figure(df):
             ax_gap.axis('off')
             grid_row += 1
 
-    # Colorbar (spans all rows except legend)
-    ax_cbar = fig.add_subplot(gs[:-1, 1])
+    # Colorbar (spans plot rows, not the spacer or legend rows)
+    ax_cbar = fig.add_subplot(gs[:-2, 1])
     norm = mcolors.Normalize(vmin=-vmax, vmax=vmax)
     sm = plt.cm.ScalarMappable(cmap=CMAP_DIVERGING, norm=norm)
     sm.set_array([])
     cbar = plt.colorbar(sm, cax=ax_cbar)
-    cbar.set_label('NES', fontsize=11)
+    cbar.set_label('NES', fontsize=14, fontweight='bold')
+    cbar.ax.tick_params(labelsize=12)
 
     # Size legend (bottom row, spanning both columns)
     ax_legend = fig.add_subplot(gs[-1, :])
     add_size_legend_visual(ax_legend, renderer)
 
-    # Title and legend
+    # Title (slightly larger; extra top margin keeps it clear of category labels)
     fig.suptitle('Comprehensive Pathway Overview by Semantic Category (Dotplot)\n'
                  f'Filtered: ≥{CONFIG["min_data_points"]} trajectory points, at least one significant result',
-                 fontsize=12, fontweight='bold', y=0.995)
+                 fontsize=15, fontweight='bold', y=0.92)
 
-    plt.tight_layout(rect=[0, 0.05, 1, 0.97])
+    plt.tight_layout(rect=[0, 0.04, 1, 0.96])
 
     # Save
     for ext, dpi in [('pdf', CONFIG['dpi']), ('png', 150)]:
