@@ -1,70 +1,69 @@
-# Alluvial Diagrams (Sankey Flows)
+# Trajectory_Flow/alluvial — Sankey / Alluvial Flows (Exploratory)
 
-## Purpose
+Exploratory alluvial / Sankey diagrams that visualise the **flow** of pathway dynamics from Early defect status → mechanism (Active TrajDev vs Passive buffering) → Late outcome. These are exploratory companions to the bump charts in `../` and `../bump/`; they are not selected as main-text figures but are linked from the supplementary text discussion of pattern-class flow.
 
-Alluvial/Sankey diagrams showing the **FLOW** of pathway dynamics from early defects
-through maturation mechanisms to late outcomes.
+## File inventory
 
-## Files
+| File | Description |
+|---|---|
+| `alluvial_binary_G32A.html` / `.png` | Binary flow (Has Early Defect vs No Defect) for G32A; interactive Plotly + static PNG |
+| `alluvial_binary_R403C.html` / `.png` | Same, R403C |
+| `alluvial_graded_G32A.html` / `.png` | Graded flow (Strong / Moderate / No defect) for G32A |
+| `alluvial_graded_R403C.html` / `.png` | Same, R403C |
+| `alluvial_ggalluvial_G32A.pdf` / `.png` | Classical R ggalluvial rendering for G32A |
+| `alluvial_ggalluvial_R403C.pdf` / `.png` | Same, R403C |
+| `alluvial_combined.pdf` / `.png` | Side-by-side combined ggalluvial composite |
 
-### Interactive Alluvial (Plotly - Python)
-- `alluvial_binary_G32A.html` - Binary view: Has Early Defect vs No Defect (Interactive)
-- `alluvial_binary_R403C.html` - Same for R403C mutation
-- `alluvial_graded_G32A.html` - Graded view: Strong/Moderate/No defect
-- `alluvial_graded_R403C.html` - Same for R403C mutation
-- Corresponding `.png` files for static viewing
-
-### Classical Alluvial (ggalluvial - R)
-- `alluvial_ggalluvial_G32A.pdf/png` - Classical alluvial for G32A
-- `alluvial_ggalluvial_R403C.pdf/png` - Classical alluvial for R403C
-- `alluvial_combined.pdf/png` - Side-by-side comparison
-
-## Structure
+## Flow structure
 
 ```
-         Early Status          Mechanism           Late Outcome
-         ────────────         ─────────           ────────────
-        ┌─────────────┐      ┌─────────┐         ┌──────────┐
-        │Early Defect │ ───► │ Active  │ ───────►│ Improved │
-        └─────────────┘      │(TrajDev)│         └──────────┘
-              │              └─────────┘              ▲
-              │                   │                   │
-              │              ┌─────────┐              │
-              └─────────────►│ Passive │─────────────┘
-                             │(Buffer) │
-                             └─────────┘
+   Early status            Mechanism                   Late outcome
+   ────────────            ─────────                   ────────────
+  ┌─────────────┐         ┌──────────┐               ┌──────────┐
+  │ Early defect│  ─────► │ Active   │  ──────────►  │ Improved │
+  └─────────────┘         │ (TrajDev)│               └──────────┘
+        │                 └──────────┘                    ▲
+        │                       │                         │
+        │                 ┌──────────┐                    │
+        └───────────────► │ Passive  │  ──────────────────┘
+                          │ (Buffer) │
+                          └──────────┘
 
-        ┌─────────────┐      ┌──────────┐        ┌───────────┐
-        │No Early Def │ ───► │Late-onset│ ──────►│ New Defect│
-        └─────────────┘      └──────────┘        └───────────┘
+  ┌─────────────┐         ┌──────────┐               ┌──────────┐
+  │ No early    │  ─────► │Late-onset│  ──────────►  │New defect│
+  │   defect    │         └──────────┘               └──────────┘
+  └─────────────┘
 ```
 
-- **LEFT**: Early defect status/severity
-- **MIDDLE**: Mechanism (Active TrajDev vs Passive buffering)
-- **RIGHT**: Late outcome (Improved, Resolved, Worsened)
-- **Late_onset**: Separate stream with no left-side input
+- **LEFT** = Early defect status / severity
+- **MIDDLE** = Mechanism (Active TrajDev vs Passive buffering)
+- **RIGHT** = Late outcome (Improved, Resolved, Worsened, New defect)
+- **Late_onset** branches form a separate stream with no left-side input
 
-## Scripts
+## Generating scripts
 
-| Script | Output | Description |
-|--------|--------|-------------|
-| `02_Analysis/3.5.viz_trajectory_flow.py` | `alluvial_binary_*.html/png`, `alluvial_graded_*.html/png` | Interactive Plotly alluvial |
-| `02_Analysis/3.6.viz_alluvial_ggalluvial.R` | `alluvial_ggalluvial_*.pdf/png`, `alluvial_combined.*` | Classical R ggalluvial |
-
-## Running
+| Script | Outputs |
+|---|---|
+| `02_Analysis/3.5.viz_trajectory_flow.py` | `alluvial_binary_*.html/.png`, `alluvial_graded_*.html/.png` (interactive Plotly) |
+| `02_Analysis/3.6.viz_alluvial_ggalluvial.R` | `alluvial_ggalluvial_*.pdf/.png`, `alluvial_combined.*` (classical R) |
 
 ```bash
-# Python (interactive Plotly)
 python3 02_Analysis/3.5.viz_trajectory_flow.py
-
-# R (classical ggalluvial)
 Rscript 02_Analysis/3.6.viz_alluvial_ggalluvial.R
 ```
 
-## See Also
+Both scripts read `03_Results/02_Analysis/master_gsea_table.csv` and pattern definitions from `01_Scripts/Python/pattern_definitions.py`.
 
-- Parent folder README for bump charts and overall documentation
-- `docs/PATTERN_CLASSIFICATION.md` for pattern definitions
+## How to read this folder
+
+For an at-a-glance flow summary, open `alluvial_combined.pdf`. For interactive exploration (hover for stream-level pathway counts and pattern composition), open the `*.html` files in a browser. The graded variants split the Early defect column by severity (Strong / Moderate / None) and are useful for showing that Compensation predominantly originates from Strong Early defects, while Late_onset and Natural_improvement populate the No-Early-Defect stream.
+
+## See also
+
+- `../README.md` — parent folder, Fig 5B / 5C bump charts
+- `../bump/README.md` — bump chart variant inventory
 
 ---
-Generated: 2024-12-04
+
+**Last Updated**: 2026-05-15
+**Generating scripts**: `02_Analysis/3.5.viz_trajectory_flow.py`, `02_Analysis/3.6.viz_alluvial_ggalluvial.R`

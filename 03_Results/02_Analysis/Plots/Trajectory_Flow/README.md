@@ -1,190 +1,63 @@
-# Trajectory Flow Visualizations
+# Trajectory Flow — Bump Charts and Alluvial Diagrams (Fig 5B, Fig 5C)
 
-## Overview
+This directory holds visualizations of pathway trajectory dynamics across the Early (D35) → TrajDev → Late (D65) developmental axis. Two primary figure types are present: bump charts (static and interactive) and alluvial/Sankey diagrams. The key paper figures are:
 
-This folder contains visualizations showing **pathway trajectory dynamics** from early (D35)
-through maturation to late (D65) timepoints for DRP1 mutations. Two main visualization types:
+- **Fig 5B** → `bump_curved_nes_significant.pdf`
+- **Fig 5C** → `bump_focused_FINAL_paper_combined.pdf`
 
-1. **Alluvial Diagrams** - Flow/Sankey plots showing how early defects branch into outcomes
-2. **Bump Charts** - Trajectory plots showing individual pathway NES changes over time
+## File inventory (root directory)
 
-## Folder Structure
+| File | Description |
+|---|---|
+| `interactive_bump_dashboard.html` | Comprehensive interactive explorer: filter by pattern/database/significance, toggle NES vs rank, color by pattern, hover for per-pathway stats |
+| `bump_curved_nes_significant.pdf` | **Fig 5B**: all significant pathways (non-Complex) with Bezier TrajDev curves, NES y-axis |
+| `bump_curved_nes_significant.png` | Raster version |
+| `bump_focused_FINAL_paper_combined.pdf` | **Fig 5C**: MitoCarta + SynGO focused pathways, weighted lines + curves + key pathway labels combined |
+| `bump_focused_FINAL_paper_combined.png` | Raster version |
+| `bump_focused_curved_nes.pdf` | Focused modules with Bezier curves, NES y-axis (unfocused variant of Fig 5C) |
+| `bump_focused_curved_nes.png` | Raster version |
 
-```
-Trajectory_Flow/
-├── README.md                               # This file
-├── interactive_bump_dashboard.html         # KEY: Interactive explorer (HTML)
-├── bump_focused_curved_nes.pdf/png         # KEY: Paper figure - focused curved
-├── bump_focused_FINAL_paper_combined.pdf/png  # KEY: Paper figure - final combined
-├── bump_curved_nes_significant.pdf/png     # KEY: Paper figure - all significant curved
-├── alluvial/                               # All alluvial/Sankey diagrams
-│   ├── README.md
-│   ├── alluvial_binary_*.html/png          # Interactive binary flow
-│   ├── alluvial_graded_*.html/png          # Interactive graded severity flow
-│   ├── alluvial_ggalluvial_*.pdf/png       # Classical ggalluvial plots
-│   └── alluvial_combined.pdf/png           # Side-by-side comparison
-└── bump/                                   # Non-key bump chart variants
-    ├── bump_*_uniform_*.pdf/png            # Uniform line width variants
-    ├── bump_*_weighted_*.pdf/png           # Weighted line width variants
-    ├── bump_*_highlight_*.pdf/png          # With pathway labels
-    └── interactive_bump_*.html             # Interactive variant explorers
-```
+### bump/ subdirectory
 
-## Key Paper Figures (Root Folder)
+Contains bump chart variants used during analysis but not selected as primary figures. See `bump/README.md` for the naming convention and variant inventory.
 
-### interactive_bump_dashboard.html
-**Interactive pathway trajectory explorer** - Comprehensive dashboard for exploring all
-pathway trajectories with filtering, toggling, and tooltips.
+### alluvial/ subdirectory
 
-**Features:**
-- Filter by pattern, database, significance
-- Toggle between NES and Rank views
-- Enable/disable trajectory curves (TrajDev visualization)
-- Color by pattern or NES value
-- Search and highlight specific pathways
-- Hover for detailed stats (NES, p-values, pattern interpretation)
+Contains alluvial/Sankey diagrams (Plotly HTML and static PDF) showing how early defects branch into different trajectory outcomes. See `alluvial/README.md`.
 
-### bump_focused_curved_nes.pdf/png
-**Focused modules (MitoCarta + SynGO) with trajectory curves** - Shows the curvature
-representing TrajDev (trajectory deviation) magnitude and direction.
+## Generating scripts
 
-**How to read:**
-- X-axis: Early (D35) to Late (D65)
-- Y-axis: NES (Normalized Enrichment Score)
-- Line curvature: TrajDev magnitude (bulge = strong trajectory effect)
-- Curve direction: TrajDev direction (upward bulge = upregulated during maturation)
+| Script | Output |
+|---|---|
+| `02_Analysis/3.7.viz_bump_chart.py` | Static bump charts (all variants in root + bump/) |
+| `02_Analysis/3.8.viz_interactive_bump_dashboard.py` | `interactive_bump_dashboard.html` |
+| `02_Analysis/3.8.viz_interactive_bump.py` | Interactive variants in bump/ |
+| `02_Analysis/3.5.viz_trajectory_flow.py` | Alluvial HTML diagrams in alluvial/ |
+| `02_Analysis/3.6.viz_alluvial_ggalluvial.R` | Classical ggalluvial PDFs in alluvial/ |
 
-### bump_focused_FINAL_paper_combined.pdf/png
-**Final paper figure** combining weighted lines, trajectory curves, and key pathway labels.
-Best representation of the trajectory analysis for publication.
+## Reading guide
 
-### bump_curved_nes_significant.pdf/png
-**All significant pathways** with trajectory curves - comprehensive view of all pathways
-showing meaningful patterns (excludes Complex).
+**Bump charts (Fig 5B, Fig 5C)**: X-axis spans Early (D35) to Late (D65). Y-axis = NES (or rank in rank-mode figures). Each line is one pathway. Line curvature encodes the TrajDev magnitude and direction (upward bulge = positive TrajDev = pathway was upregulated more in mutants during maturation; downward bulge = negative TrajDev). Curves only appear for pathways with significant TrajDev (FDR < 0.05). Straight lines indicate no significant developmental trajectory deviation.
 
-## Bump Chart Module
+**Line weight encoding (weighted/FINAL variants)**: Line width is inversely proportional to pattern frequency — dominant patterns (Compensation, > 30% of pathways) are thin and low-opacity (background); rare patterns (Sign_reversal, Progressive, < 1%) are thick and fully opaque (foreground), ensuring rare trajectories are visible against the mass.
 
-The bump chart visualization system is implemented in `01_Scripts/Python/viz_bump_charts.py`.
+**Color by pattern**: Compensation = green; Sign_reversal = orange/red; Progressive = purple; Natural_improvement = light blue; Late_onset = yellow. See `01_Scripts/Python/pattern_definitions.py` for canonical color mapping.
 
-### Key Concepts
+**Key finding**: The Sign_reversal lines for SynGO synaptic-ribosome pathways (postsynaptic and presynaptic ribosome) arch visibly downward through TrajDev — the largest-amplitude downward curves in the focused panel — while MitoCarta mitochondrial pathways arch upward (Compensation). This divergence is the visual summary of the translation paradox.
 
-#### Scopes
-- **focused**: MitoCarta + SynGO databases (~100-200 pathways)
-- **significant**: All meaningful patterns except Complex (~2-4k pathways)
-- **all**: All pathways (~12k) - rarely used due to density
+**Interactive dashboard**: Click any pathway line to see per-pathway stats (NES at each stage, FDR, pattern, database). Use the filter panel to isolate specific databases or patterns.
 
-#### Y-Axis Types
-- **NES**: Normalized Enrichment Score - shows effect strength and direction
-- **Rank**: Relative ordering by NES - shows position changes
+## Manuscript figure captions
 
-#### Visual Modes
-- **uniform**: All lines same width (baseline)
-- **weighted**: Line width inversely proportional to pattern frequency
-  - Dominant (>30%): Thin, low opacity (background)
-  - Common (>10%): Medium width
-  - Uncommon (>1%): Thicker
-  - Rare (<1%): Thickest, full opacity (foreground)
+### Fig 5B (`bump_curved_nes_significant.pdf`)
 
-### Layering Algorithm
+**Pathway-level trajectory bump chart for all significantly enriched non-Complex pathways across the Early → TrajDev → Late developmental axis in DRP1 mutant cortical neurons.** Each line represents one GSEA pathway (n shown in panel header), with x-axis = trajectory stage (Early = D35 mutant-vs-control, TrajDev = mutation-specific maturation interaction, Late = D65 mutant-vs-control) and y-axis = GSEA NES. Lines are drawn as quadratic Bezier curves whose control-point displacement encodes the TrajDev NES magnitude and direction; pathways without significant TrajDev (FDR ≥ 0.05) are drawn as straight Early-to-Late segments. Line colour encodes trajectory pattern (Compensation = green; Sign_reversal = orange/red; Progressive = purple; Natural_improvement = light blue; Late_onset = yellow; canonical palette in `01_Scripts/Python/pattern_definitions.py`). Line width is inversely proportional to pattern frequency in the full universe so that rare pattern classes (Sign_reversal, Progressive; < 1% of pathways) remain visible against the Compensation mass (~30% of pathways). G32A and R403C panels are drawn side-by-side. The figure provides the system-level visual summary of the trajectory-pattern landscape that the rest of Fig 5 dissects at the per-module level.
 
-Lines are rendered in specific order to ensure rare patterns are visible:
+### Fig 5C (`bump_focused_FINAL_paper_combined.pdf`)
 
-1. **Sort patterns** by weight category (dominant → rare)
-2. **Within category**, sort by frequency (more frequent first)
-3. **Render in order**: Frequent patterns draw first (bottom layer)
-4. **Result**: Rare patterns appear on top, visible against the mass
-
-### Filtering Logic
-
-Pathways pass through multiple filters:
-1. **Scope filter**: Database membership (focused) or pattern significance (significant)
-2. **Pattern filter**: Must have meaningful pattern (not Complex, not Insufficient_data)
-3. **NES completeness**: Must have valid NES values for both Early and Late
-
-### Curving Algorithm (TrajDev Visualization)
-
-When `show_curves=True`, lines are rendered as quadratic Bezier curves:
-
-```
-P0 = (0, Early_NES)           # Start point
-P2 = (1, Late_NES)            # End point
-P1 = (0.5, Y_mid + offset)    # Control point (determines curve)
-
-Where:
-  Y_mid = (Early_NES + Late_NES) / 2
-  offset = TrajDev_NES × curve_strength  (for NES mode)
-  offset = -TrajDev_NES × scale × curve_strength  (for Rank mode)
-```
-
-**Curve interpretation:**
-- Upward bulge: Positive TrajDev (pathway upregulated during maturation)
-- Downward bulge: Negative TrajDev (pathway downregulated during maturation)
-- Straight line: No significant TrajDev or TrajDev ≈ 0
-
-**Note:** Curves only appear for pathways with significant TrajDev (p.adjust < 0.05).
-
-### Highlight Selection
-
-When `show_highlights=True`, pathways are labeled using priority ranking:
-
-1. **Filter**: Remove irrelevant pathways (viral, bacterial, non-neuronal)
-2. **Prioritize**: Semantic categories (Mitochondrial > Synaptic > Ribosomal > Other)
-3. **Sort**: By priority, then by |NES change| magnitude
-4. **Select**: Top N per pattern (default 5)
-5. **Position**: Use adjustText library to prevent label overlap
-
-## Scripts
-
-| Script | Output | Description |
-|--------|--------|-------------|
-| `3.5.viz_trajectory_flow.py` | `alluvial/*.html/png` | Interactive Plotly alluvial diagrams |
-| `3.6.viz_alluvial_ggalluvial.R` | `alluvial/*.pdf/png` | Classical ggalluvial diagrams |
-| `3.7.viz_bump_chart.py` | Root + `bump/*` | Static bump charts (all variants) |
-| `3.8.viz_interactive_bump.py` | `bump/interactive_*.html` | Interactive bump chart variants |
-| `3.8.viz_interactive_bump_dashboard.py` | `interactive_bump_dashboard.html` | Main interactive dashboard |
-
-## Running the Scripts
-
-```bash
-# Generate alluvial diagrams (both Python and R)
-python3 02_Analysis/3.5.viz_trajectory_flow.py
-Rscript 02_Analysis/3.6.viz_alluvial_ggalluvial.R
-
-# Generate all bump chart variants
-python3 02_Analysis/3.7.viz_bump_chart.py
-
-# Generate interactive bump charts
-python3 02_Analysis/3.8.viz_interactive_bump.py
-python3 02_Analysis/3.8.viz_interactive_bump_dashboard.py
-```
-
-## Biological Interpretation
-
-### Key Finding: 99.9% of Early Defects Improve
-
-During neuronal maturation (D35 → D65):
-- **~60%** improve through **Active Compensation** (significant TrajDev opposing the defect)
-- **~40%** improve through **Passive Buffering** (normal developmental processes)
-- **~0.1%** worsen (Progressive pattern)
-- **46-61 pathways** show **Late_onset** (new defects emerging without early problems)
-
-### Pattern Trajectories on Bump Charts
-
-| Pattern | Early NES | Curve Direction | Late NES |
-|---------|-----------|-----------------|----------|
-| Compensation | Strong defect | Opposing (bulge toward 0) | Reduced |
-| Progressive | Strong defect | Amplifying (bulge away from 0) | Worsened |
-| Natural_improvement | Strong defect | Minimal curve | Reduced |
-| Natural_worsening | Strong defect | Minimal curve | Worsened |
-| Late_onset | Near zero | Variable | New defect |
-| Transient | Strong defect | Variable | Resolved |
-
-## Related Documentation
-
-- `docs/PATTERN_CLASSIFICATION.md` - Full pattern classification framework
-- `01_Scripts/Python/pattern_definitions.py` - Canonical pattern classification code
-- `01_Scripts/Python/viz_bump_charts.py` - Bump chart visualization module
-- `03_Results/02_Analysis/master_gsea_table.csv` - Source data
+**Trajectory bump chart restricted to the focused MitoCarta + SynGO pathway panel.** Same axis encoding and line-style conventions as Fig 5B but with pathway scope restricted to the MitoCarta mitochondrial pathway set (n = 149) and the SynGO synaptic-localisation set (~300 pathways); the combined "weighted + curved + key-pathway-label" rendering is the manuscript-version composite. Key pathway labels (postsynaptic ribosome, presynaptic ribosome, mitochondrial ribosome, OXPHOS, ribosome biogenesis) are placed using adjustText with semantic priority (Mitochondrial > Synaptic > Ribosomal > Other). The panel makes visible the bidirectional split that defines the translation paradox: SynGO synaptic-ribosome pathways arch sharply downward through TrajDev (the largest-amplitude downward curves in the panel, NES_TrajDev ≈ −3.0), while MitoCarta mitochondrial-translation and OXPHOS pathways arch upward (Compensation pattern, NES_TrajDev ≈ +1.5 to +2.5). Statistical thresholds inherited from the upstream fgsea pipeline (10,000 permutations, BH-FDR < 0.05) and pattern assignments from `master_gsea_table.csv` per the criteria in `01_Scripts/Python/pattern_definitions.py`.
 
 ---
-Generated: 2024-12-04
+
+**Last Updated**: 2026-05-15
+**Generating scripts**: `02_Analysis/3.7.viz_bump_chart.py`, `02_Analysis/3.8.viz_interactive_bump_dashboard.py`, `02_Analysis/3.5.viz_trajectory_flow.py`, `02_Analysis/3.6.viz_alluvial_ggalluvial.R`

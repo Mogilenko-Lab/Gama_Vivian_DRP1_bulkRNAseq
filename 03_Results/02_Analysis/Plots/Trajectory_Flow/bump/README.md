@@ -1,69 +1,68 @@
-# Bump Chart Variants
+# Trajectory_Flow/bump — Bump Chart Variants (Non-Key Figures)
 
-## Purpose
+This subdirectory contains alternative bump chart visualizations used during analysis to explore different visual encodings. The primary paper figures (`bump_curved_nes_significant.pdf` for Fig 5B and `bump_focused_FINAL_paper_combined.pdf` for Fig 5C) remain in the parent `../` directory.
 
-This folder contains **non-key bump chart variants** - alternative visualizations used
-during analysis but not selected as primary paper figures. The key figures remain in
-the parent folder.
-
-## File Naming Convention
+## File naming convention
 
 ```
 bump_{scope}_{style}_{metric}.{ext}
 ```
 
-- **scope**: `focused` (MitoCarta+SynGO) or `significant` (all meaningful patterns)
+- **scope**: `focused` (MitoCarta + SynGO, ~100–200 pathways) or `significant` (all non-Complex patterns, ~2,000–4,000 pathways)
 - **style**: `uniform`, `weighted`, `highlight`, `curved`, `FINAL_paper_combined`
-- **metric**: `nes` (effect size) or `rank` (relative position)
-- **ext**: `pdf`, `png`, or `html`
+- **metric**: `nes` (Normalized Enrichment Score on y-axis) or `rank` (relative rank position on y-axis)
+- **ext**: `pdf` or `png`
 
-## Variant Types
+## File inventory
 
-### Uniform (`bump_*_uniform_*`)
-All lines same width and opacity - baseline visualization without weighting.
+| File | Description |
+|---|---|
+| `bump_curved_nes_focused.pdf/.png` | Focused scope, curved lines (TrajDev Bezier), NES y-axis |
+| `bump_curved_nes_significant.pdf/.png` | Significant scope, curved lines, NES y-axis (note: version with paper labels is in parent dir) |
+| `bump_focused_highlight_nes.pdf/.png` | Focused scope, weighted lines with key pathway labels, NES y-axis |
+| `bump_focused_uniform_nes.pdf/.png` | Focused scope, uniform line width, NES y-axis |
+| `bump_focused_uniform_rank.pdf/.png` | Focused scope, uniform line width, rank y-axis |
+| `bump_focused_weighted_nes.pdf/.png` | Focused scope, weighted line width, NES y-axis |
+| `bump_focused_weighted_rank.pdf/.png` | Focused scope, weighted line width, rank y-axis |
+| `bump_significant_curved_nes.pdf/.png` | Significant scope, curved lines, NES y-axis |
+| `bump_significant_curved_rank.pdf/.png` | Significant scope, curved lines, rank y-axis |
+| `bump_significant_FINAL_paper_combined.pdf/.png` | Significant scope version of combined weighted+curved+labels figure |
+| `bump_significant_highlight_nes.pdf/.png` | Significant scope with pathway labels, NES y-axis |
+| `bump_significant_uniform_nes.pdf/.png` | Significant scope, uniform line width, NES y-axis |
+| `bump_significant_uniform_rank.pdf/.png` | Significant scope, uniform line width, rank y-axis |
+| `bump_significant_weighted_nes.pdf/.png` | Significant scope, weighted line width, NES y-axis |
+| `bump_significant_weighted_rank.pdf/.png` | Significant scope, weighted line width, rank y-axis |
+| `bump_uniform_nes_focused.pdf/.png` | Alias variant (uniform/NES/focused) |
+| `bump_uniform_nes_significant.pdf/.png` | Alias variant (uniform/NES/significant) |
+| `bump_uniform_rank_focused.pdf/.png` | Alias variant (uniform/rank/focused) |
+| `bump_uniform_rank_significant.pdf/.png` | Alias variant (uniform/rank/significant) |
+| `bump_weighted_nes_focused.pdf/.png` | Alias variant (weighted/NES/focused) |
+| `bump_weighted_nes_significant.pdf/.png` | Alias variant (weighted/NES/significant) |
+| `bump_weighted_rank_focused.pdf/.png` | Alias variant (weighted/rank/focused) |
+| `bump_weighted_rank_significant.pdf/.png` | Alias variant (weighted/rank/significant) |
 
-### Weighted (`bump_*_weighted_*`)
-Line width inversely proportional to pattern frequency:
-- Dominant patterns (>30%): Thin, low opacity (background)
-- Rare patterns (<1%): Thick, high opacity (foreground)
+## Generating scripts
 
-### Highlight (`bump_*_highlight_*`)
-Weighted lines with key pathway labels added.
+- `02_Analysis/3.7.viz_bump_chart.py` — static variants
+- `02_Analysis/3.8.viz_interactive_bump.py` — interactive HTML variants (if present)
 
-### Curved (`bump_*_curved_*`)
-Lines rendered as Bezier curves showing TrajDev magnitude/direction.
-**Note:** Key curved figures are in parent folder.
+## Visual encoding notes
 
-### FINAL Paper Combined
-Weighted + Curved + Highlights combined.
-**Note:** Focused version is in parent folder.
+**uniform**: All lines same width and opacity — baseline with no pattern-frequency weighting.
 
-## Interactive Variants
+**weighted**: Line width inversely proportional to pattern frequency. Dominant patterns (> 30%, e.g., Compensation) are thin/low-opacity; rare patterns (< 1%, e.g., Sign_reversal, Progressive) are thick/full-opacity. This ensures rare trajectories are visible against the mass.
 
-- `interactive_bump_*.html` - Plotly-based interactive versions
-- Toggle patterns, filter by significance, hover for details
+**highlight**: Weighted lines with key pathway labels added using adjustText for non-overlapping placement. Labels prioritize semantic categories (Mitochondrial > Synaptic > Ribosomal > Other).
 
-## Key Files (in Parent Folder)
+**curved**: Lines rendered as quadratic Bezier curves. The control point displacement from the straight line encodes the TrajDev NES magnitude and direction. Curves only shown for pathways with significant TrajDev (FDR < 0.05); others are straight lines.
 
-The following key files remain in the parent `Trajectory_Flow/` folder:
-- `interactive_bump_dashboard.html` - Main interactive explorer
-- `bump_focused_curved_nes.pdf/png` - Focused modules with curves
-- `bump_focused_FINAL_paper_combined.pdf/png` - Final paper figure
-- `bump_curved_nes_significant.pdf/png` - All significant with curves
+**NES vs rank**: NES y-axis preserves absolute effect magnitudes and allows reading enrichment strength directly. Rank y-axis normalizes for cross-database NES differences and emphasizes relative position changes.
 
-## Scripts
+## How to read this folder
 
-| Script | Description |
-|--------|-------------|
-| `02_Analysis/3.7.viz_bump_chart.py` | Static bump chart generator |
-| `02_Analysis/3.8.viz_interactive_bump.py` | Interactive variant generator |
-
-## Running
-
-```bash
-python3 02_Analysis/3.7.viz_bump_chart.py
-python3 02_Analysis/3.8.viz_interactive_bump.py
-```
+For the manuscript figures jump up one level (`../bump_curved_nes_significant.pdf` for Fig 5B and `../bump_focused_FINAL_paper_combined.pdf` for Fig 5C). The variants in this folder are diagnostic / alternative encodings used during figure selection — they are kept in the repository so a reviewer can audit the visual choices that led to the manuscript versions, and so the `weighted_rank_*` and `uniform_rank_*` alternatives can be substituted if the editor prefers a rank-y-axis view. None of the files here are independently cited in the main text or supplement.
 
 ---
-Generated: 2024-12-04
+
+**Last Updated**: 2026-05-15
+**Generating script**: `02_Analysis/3.7.viz_bump_chart.py`
