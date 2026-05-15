@@ -5,9 +5,10 @@
 .gitignore
 NEXT_SESSION*
 SESSION_SUMMARY*
-
+.gitignore
 .pytest_cache
 __pycache__
+01_Scripts/.ref/
 
 # AI-specs
 CLAUDE.md
