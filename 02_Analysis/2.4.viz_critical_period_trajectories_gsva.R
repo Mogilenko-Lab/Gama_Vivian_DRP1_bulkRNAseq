@@ -522,7 +522,7 @@ for (mod in module_info) {
     trajectory_panels[[mod$key]] <- p
 
     # Save individual panel
-    filename <- sprintf("Panel_%s_%s.pdf", mod$panel, mod$key)
+    filename <- sprintf("Panel_%s_%s_trajectory.pdf", mod$panel, mod$key)
     ggsave(file.path(traj_dir, filename), p,
            width = config$panel_width, height = config$panel_height)
     message(sprintf("  \U2713 %s", filename))
@@ -557,7 +557,7 @@ for (mod in module_info) {
     divergence_panels[[mod$key]] <- p
 
     # Save individual panel
-    filename <- sprintf("Panel_%s_%s.pdf", mod$panel, mod$key)
+    filename <- sprintf("Panel_%s_%s_divergence.pdf", mod$panel, mod$key)
     ggsave(file.path(div_dir, filename), p,
            width = config$panel_width, height = config$panel_height)
     message(sprintf("  \U2713 %s", filename))
@@ -740,11 +740,11 @@ message(sprintf("\n\U0001F4C1 Output directory: %s", gsva_dir))
 message("\n\U0001F3AF KEY OUTPUTS:")
 message("  Trajectory panels (gsva/trajectory/):")
 for (mod in module_info) {
-  message(sprintf("    - Panel_%s_%s.pdf", mod$panel, mod$key))
+  message(sprintf("    - Panel_%s_%s_trajectory.pdf", mod$panel, mod$key))
 }
 message("  Divergence panels (gsva/divergence/):")
 for (mod in module_info) {
-  message(sprintf("    - Panel_%s_%s.pdf", mod$panel, mod$key))
+  message(sprintf("    - Panel_%s_%s_divergence.pdf", mod$panel, mod$key))
 }
 message("  Combined figures (gsva/combined/):")
 message("    - Trajectory_7panel_grid.pdf")

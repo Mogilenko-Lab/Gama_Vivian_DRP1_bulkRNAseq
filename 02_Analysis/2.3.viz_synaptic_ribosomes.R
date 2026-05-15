@@ -261,6 +261,135 @@ dev.off()
 message("✓ Panel C complete\n")
 
 ###############################################################################
+##  PANEL C (refactored): Sample-level expression heatmap                    ##
+##  Print-typography variant, no compartment side-strip, log2 CPM per sample ##
+###############################################################################
+
+message("📊 Creating refactored Panel C: sample-level expression heatmap...")
+
+# Voom-normalized log2 CPM and per-sample metadata
+voom_obj   <- readRDS(file.path(checkpoint_dir, "voom_object.rds"))
+dge_obj    <- readRDS(file.path(checkpoint_dir, "DGE_object.rds"))
+expr_mat   <- voom_obj$E
+sample_meta <- dge_obj$samples
+sample_meta$sample_id <- rownames(sample_meta)
+
+# Subset to ribosome genes detected in expression matrix
+ribo_present <- intersect(all_ribosome_genes_sorted, rownames(expr_mat))
+expr_sub     <- expr_mat[ribo_present, , drop = FALSE]
+
+# Row z-score so the matrix shows Ctrl→Mutant dynamics on a common scale
+# (raw log2 CPM mixes high- and low-abundance genes and washes out variation).
+expr_z <- t(scale(t(expr_sub), center = TRUE, scale = TRUE))
+
+# Compartment factor — used for row split only, no colored side strip
+compartment_subset <- factor(
+  ifelse(ribo_present %in% shared_genes, "Both",
+         ifelse(ribo_present %in% postsyn_only, "Postsynaptic only", "Unknown")),
+  levels = c("Postsynaptic only", "Both")
+)
+
+# Order samples Genotype (G32A → R403C → Control) → Day (D35 → D65) → replicate
+sample_meta$genotype <- factor(sample_meta$genotype, levels = c("G32A", "R403C", "Control"))
+sample_meta$days     <- factor(sample_meta$days,     levels = c("D35", "D65"))
+sample_meta <- sample_meta[order(sample_meta$genotype, sample_meta$days, sample_meta$rep), ]
+expr_z      <- expr_z[, sample_meta$sample_id, drop = FALSE]
+
+# Six-group column split (Genotype × Day) — D35 then D65 within each genotype
+column_split <- factor(
+  paste(sample_meta$genotype, sample_meta$days, sep = "\n"),
+  levels = c("G32A\nD35",   "G32A\nD65",
+             "R403C\nD35",  "R403C\nD65",
+             "Control\nD35","Control\nD65")
+)
+
+# Within-group replicate index → compact column labels
+sample_short <- ave(seq_along(column_split), column_split, FUN = seq_along)
+
+# Compact top-of-column annotation (Day + Genotype)
+genotype_colors <- c("Control" = "#BBBBBB", "G32A" = "#E69F00", "R403C" = "#0072B2")
+day_colors      <- c("D35" = "#D9D9D9", "D65" = "#525252")
+
+ha_top <- HeatmapAnnotation(
+  Day      = sample_meta$days,
+  Genotype = sample_meta$genotype,
+  col = list(Day = day_colors, Genotype = genotype_colors),
+  annotation_name_side = "left",
+  annotation_name_gp   = gpar(fontsize = 8),
+  simple_anno_size     = unit(2.2, "mm"),
+  gap                  = unit(0.4, "mm"),
+  show_legend          = TRUE,
+  annotation_legend_param = list(
+    Day = list(title = "Day", title_gp = gpar(fontsize = 9, fontface = "bold"),
+               labels_gp = gpar(fontsize = 8),
+               grid_height = unit(4, "mm"), grid_width = unit(4, "mm")),
+    Genotype = list(title = "Genotype", title_gp = gpar(fontsize = 9, fontface = "bold"),
+                    labels_gp = gpar(fontsize = 8),
+                    grid_height = unit(4, "mm"), grid_width = unit(4, "mm"))
+  )
+)
+
+# Diverging palette matched to original Panel C: Blue–White–Orange.
+# Symmetric clip at ±2 SD on row-z (sample-level dynamic range).
+zmax  <- 2
+col_z <- colorRamp2(c(-zmax, 0, zmax), c("#2166AC", "#F7F7F7", "#B35806"))
+
+# Compact figure (~4.4 × 6.6 in keeps original ~0.66 ratio, smaller print footprint)
+pdf(file.path(out_dir, "Panel_C_Sample_Heatmap.pdf"), width = 4.4, height = 6.6)
+ht_samp <- Heatmap(
+  expr_z,
+  name = "z",
+  col  = col_z,
+
+  # Rows — names left, no side strip, split by SynGO compartment
+  row_names_side       = "left",
+  row_names_gp         = gpar(fontsize = 7),
+  cluster_rows         = TRUE,
+  cluster_row_slices   = FALSE,
+  show_row_dend        = FALSE,
+  row_split            = compartment_subset,
+  row_title            = c("Postsynaptic only", "Postsynaptic + Presynaptic"),
+  row_title_gp         = gpar(fontface = "bold", fontsize = 9),
+  row_title_rot        = 90,
+  row_gap              = unit(1.5, "mm"),
+
+  # Columns — day×genotype split (no per-sample tick labels for cleanliness)
+  cluster_columns       = FALSE,
+  show_column_names     = FALSE,
+  column_split          = column_split,
+  column_title_gp       = gpar(fontface = "bold", fontsize = 8),
+  column_gap            = unit(0.6, "mm"),
+
+  top_annotation = ha_top,
+
+  # Cells — flat fill, narrow matrix to push the figure into a thin column
+  border  = TRUE,
+  rect_gp = gpar(col = NA),
+  width   = unit(55, "mm"),
+
+  heatmap_legend_param = list(
+    title         = "Row z-score\n(log2 CPM)",
+    at            = c(-2, -1, 0, 1, 2),
+    legend_height = unit(34, "mm"),
+    grid_width    = unit(4, "mm"),
+    title_gp      = gpar(fontface = "bold", fontsize = 9),
+    labels_gp     = gpar(fontsize = 8)
+  )
+)
+
+draw(
+  ht_samp,
+  heatmap_legend_side    = "right",
+  annotation_legend_side = "right",
+  merge_legend           = TRUE,
+  column_title           = "Synaptic Ribosome Expression — sample-level",
+  column_title_gp        = gpar(fontface = "bold", fontsize = 10)
+)
+dev.off()
+
+message("✓ Refactored Panel C (sample-level) complete\n")
+
+###############################################################################
 ##  PANEL D: REMOVED - Redundant scatter plot                               ##
 ###############################################################################
 ## This panel showed pre vs post NES on a diagonal (equal effects)
