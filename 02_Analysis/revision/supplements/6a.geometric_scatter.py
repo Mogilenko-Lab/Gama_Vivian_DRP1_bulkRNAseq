@@ -101,7 +101,15 @@ def _prepare(df: pd.DataFrame, mut: str) -> pd.DataFrame:
 _PREF_DBS = {"MitoCarta", "SynGO", "gobp", "gocc"}
 
 
-def _place_labels(ax, sub: pd.DataFrame, top_n: int, lim: float) -> None:
+def _place_labels(
+    ax,
+    sub: pd.DataFrame,
+    top_n: int,
+    lim: float,
+    fontsize: float = 7.5,
+    max_chars: int = 22,
+    min_dy: float = 0.46,
+) -> None:
     """
     Label the top-N pathways by label-priority score.
 
@@ -126,9 +134,7 @@ def _place_labels(ax, sub: pd.DataFrame, top_n: int, lim: float) -> None:
     # axis edge so text extends INWARD (toward plot centre), never outward.
     # Right quadrant: anchor at +30 % of lim (text grows rightward, safe).
     # Left  quadrant: anchor at -lim + margin (text grows rightward, safe).
-    MARGIN   = 0.12   # gap from axis edge in data units
-    MIN_DY   = 0.38
-    MAX_CHARS = 24    # hard cap — at fontsize 5.5 this stays inside either half
+    MARGIN = 0.12   # gap from axis edge in data units
 
     for (qx, qy), rows in quad_rows.items():
         rows = sorted(rows, key=lambda r: float(r["_early"]), reverse=(qy == 1))
@@ -148,11 +154,11 @@ def _place_labels(ax, sub: pd.DataFrame, top_n: int, lim: float) -> None:
             raw = r["_pathway"] if isinstance(r["_pathway"], str) else str(r["_pathway"])
             db  = str(r.get("_database", ""))
             # Truncate first, then prepend DB tag for preferred databases
-            short = (raw[:MAX_CHARS] + "…") if len(raw) > MAX_CHARS else raw
+            short = (raw[:max_chars] + "…") if len(raw) > max_chars else raw
             label = f"[{db}] {short}" if db in _PREF_DBS else short
 
             ly = y_start if i == 0 else float(
-                np.clip(placed_y[-1] + direction * MIN_DY, -lim + 0.15, lim - 0.15)
+                np.clip(placed_y[-1] + direction * min_dy, -lim + 0.15, lim - 0.15)
             )
             placed_y.append(ly)
 
@@ -160,7 +166,7 @@ def _place_labels(ax, sub: pd.DataFrame, top_n: int, lim: float) -> None:
                 label,
                 xy=(float(r["_late"]), float(r["_early"])),
                 xytext=(x_col, ly),
-                fontsize=5.5,
+                fontsize=fontsize,
                 ha=ha,
                 va="center",
                 annotation_clip=False,   # never suppress or clip
@@ -191,8 +197,20 @@ def _plot_one(
     top_n_label: int = 4,
     legend: bool = True,
     title: str | None = None,
+    sizes: dict | None = None,
 ) -> None:
     """Draw one geometric scatter panel onto *ax*."""
+    sizes = sizes or {}
+    s_axis   = sizes.get("axis",   11)
+    s_title  = sizes.get("title",  12)
+    s_tick   = sizes.get("tick",    9)
+    s_quad   = sizes.get("quad",   8.5)
+    s_legend = sizes.get("legend",  9)
+    s_annot  = sizes.get("annot",  7.5)
+    s_dot    = sizes.get("dot",     12)
+    max_chars = sizes.get("max_chars", 22)
+    min_dy    = sizes.get("min_dy", 0.46)
+
     lim = float(min(max(sub["_early"].abs().max(), sub["_late"].abs().max(), 3.0), 4.5))
 
     ax.axhline(0, color="k", lw=0.7, ls="--", alpha=0.6)
@@ -202,6 +220,7 @@ def _plot_one(
             label="_nolegend_")
     ax.set_xlim(-lim, lim)
     ax.set_ylim(-lim, lim)
+    ax.tick_params(axis="both", labelsize=s_tick)
 
     for cat in CAT_ORDER:
         s = sub[sub["_super_cat"] == cat]
@@ -209,15 +228,16 @@ def _plot_one(
             continue
         ax.scatter(s["_late"], s["_early"],   # x=Late, y=Early
                    c=SUPER_CATEGORY_COLORS.get(cat, "#999999"),
-                   alpha=0.42, s=10, linewidths=0, label=cat)
+                   alpha=0.42, s=s_dot, linewidths=0, label=cat)
 
-    _place_labels(ax, sub, top_n_label, lim)
+    _place_labels(ax, sub, top_n_label, lim,
+                  fontsize=s_annot, max_chars=max_chars, min_dy=min_dy)
 
-    ax.set_xlabel("NES Late (D65 mutant vs. control)",  fontsize=10)   # x
-    ax.set_ylabel("NES Early (D35 mutant vs. control)", fontsize=10, labelpad=8)  # y
+    ax.set_xlabel("NES Late (D65 mutant vs. control)",  fontsize=s_axis)   # x
+    ax.set_ylabel("NES Early (D35 mutant vs. control)", fontsize=s_axis, labelpad=8)  # y
     ax.set_title(
         title or f"{mut_label}: trajectory patterns in (NES_Late, NES_Early) space",
-        fontsize=11, fontweight="bold",
+        fontsize=s_title, fontweight="bold",
     )
     ax.set_aspect("equal", "box")
 
@@ -229,14 +249,14 @@ def _plot_one(
         ( lim * 0.95, -lim * 0.95, "Early-down /\nLate-up\n(Sign_reversal)", "right", "bottom"),
     ]
     for tx, ty, txt, ha, va in corner_specs:
-        ax.text(tx, ty, txt, ha=ha, va=va, fontsize=7, color="grey", alpha=0.70)
+        ax.text(tx, ty, txt, ha=ha, va=va, fontsize=s_quad, color="grey", alpha=0.70)
 
     if legend:
         handles = _build_legend_handles()
-        ax.legend(handles=handles, fontsize=7, loc="upper left",
+        ax.legend(handles=handles, fontsize=s_legend, loc="upper left",
                   bbox_to_anchor=(1.02, 1.0), frameon=True,
                   edgecolor="#dddddd", facecolor="white",
-                  title="Super-category", title_fontsize=7.5)
+                  title="Super-category", title_fontsize=s_legend + 0.5)
 
 
 def main() -> None:
@@ -256,25 +276,40 @@ def main() -> None:
         plt.close(fig)
 
     # ── Side-by-side figure ──────────────────────────────────────────────────
-    fig, axes = plt.subplots(1, 2, figsize=(13, 6.5))
+    # Journal print-ready: condensed two-panel layout sized for double-column
+    # journal width with fonts bumped so they remain legible after scaling.
+    print_sizes = {
+        "axis":   12,
+        "title":  13,
+        "tick":   10,
+        "quad":    9.5,
+        "legend": 10,
+        "annot":   8.5,
+        "dot":    14,
+        "max_chars": 24,
+        "min_dy": 0.55,
+    }
+    fig, axes = plt.subplots(1, 2, figsize=(11, 6.2))
     for ax, mut in zip(axes, ("G32A", "R403C")):
         sub = _prepare(df, mut)
-        _plot_one(ax, sub, mut_label=mut, top_n_label=3, legend=False)
+        _plot_one(
+            ax, sub, mut_label=mut,
+            top_n_label=3, legend=False,
+            title=f"{mut}",
+            sizes=print_sizes,
+        )
 
     handles = _build_legend_handles()
-    fig.legend(handles=handles, fontsize=7, loc="center left",
+    fig.legend(handles=handles, fontsize=print_sizes["legend"], loc="center left",
                bbox_to_anchor=(1.00, 0.50), frameon=True,
                edgecolor="#dddddd", facecolor="white",
-               title="Super-category", title_fontsize=7.5)
+               title="Super-category", title_fontsize=print_sizes["legend"] + 1)
     fig.suptitle(
-        "Trajectory patterns in (NES_Late, NES_Early) space \u2014 "
-        "geometric interpretation of the classifier boundaries\n"
-        "(x = Late outcome; y = initial state; color = TrajDev significance gate: "
-        "Active vs. Passive)",
-        fontsize=10, y=1.02,
+        "Trajectory patterns in (NES$_{Late}$, NES$_{Early}$) space",
+        fontsize=13, y=0.995, fontweight="bold",
     )
-    fig.tight_layout()
-    fig.subplots_adjust(wspace=0.30)
+    fig.tight_layout(rect=[0, 0, 1, 0.955])
+    fig.subplots_adjust(wspace=0.18)
     for ext in ("pdf", "png"):
         out = OUT_DIR / f"geometric_scatter_both_mutations.{ext}"
         fig.savefig(out, bbox_inches="tight", **({"dpi": 300} if ext == "png" else {}))

@@ -22,10 +22,10 @@ reframe visually unambiguous in a single panel pair:
     Mitochondrial Ribosome - biogenesis         Synaptic Ribosome  (amplitude max)
     Cytoplasmic Ribosome - biogenesis
 
-The split is not "mitochondria vs cytoplasm" and it is not "synapse vs bulk":
-mitochondrial ribosomes (structural AND biogenesis) travel with the
-cytoplasmic ribosome biogenesis program; cytoplasmic structural ribosomes do
-the opposite, and the synaptic-localised RPL/RPS proteins sit at the
+Mitochondrial ribosomes (structural AND biogenesis) travel with the
+cytoplasmic ribosome biogenesis program towards compensation; 
+cytoplasmic structural ribosomes do the opposite, and the 
+synaptic-localised RPL/RPS proteins sit at the
 amplitude extreme of that opposite arc.
 
 Semantic aggregation rationale (one paragraph per category)
@@ -39,23 +39,23 @@ GSEA statistic, not biologically distinct gene families. See `docs/6c_*` and
 the README in this folder for the full curation argument.
 
 1. Mitochondrial Ribosome - structural
-   MitoCarta "Mitochondrial_ribosome" plus GO:CC mitochondrial large/small
-   ribosomal subunit plus GO:CC organellar ribosome (in mammalian gene sets,
-   "organellar" effectively means mitochondrial - no plastid ribosomes).
+   - MitoCarta "Mitochondrial_ribosome" 
+   - GO:CC mitochondrial large/small ribosomal subunit 
+   - GO:CC organellar ribosome (effectively means mitochondrial - no plastid ribosomes).
    Members are the assembled MRPL/MRPS subunits.
 
 2. Mitochondrial Ribosome - biogenesis
-   MitoCarta "Mitochondrial_ribosome_assembly" plus the GO:BP mitochondrial
-   ribosome assembly term. Members are accessory factors (chaperones,
+   - MitoCarta "Mitochondrial_ribosome_assembly" 
+   - GO:BP mitochondrial ribosome assembly term.
+   Members are accessory factors (chaperones,
    modifying enzymes) that build the mito ribosome but are not subunits of
    the assembled particle.
 
 3. Cytoplasmic Ribosome - biogenesis
-   GO:BP ribosome biogenesis and assembly, the GO:BP small/large subunit
-   biogenesis terms, ribosomal subunit export from nucleus, and the GO:CC
-   pre-ribosome compartments. Members are nucleolar / nuclear-export
-   biogenesis factors (NOP, FBL, PES1, BOP1, DKC1, etc.), not assembled
-   cytosolic ribosomes.
+   - GO:BP ribosome biogenesis and assembly, 
+   - the GO:BP small/large subunit biogenesis terms, ribosomal subunit export from nucleus, 
+   - the GO:CC pre-ribosome compartments. 
+   Members are nucleolar / nuclear-export biogenesis factors (NOP, FBL, PES1, BOP1, DKC1, etc.), not assembled cytosolic ribosomes.
 
 4. Cytoplasmic Ribosome - structural
    The assembled 80S compartment: GO:CC cytosolic ribosome, cytosolic
@@ -67,7 +67,7 @@ the README in this folder for the full curation argument.
    The two SynGO Cellular-Component ribosome terms (presyn_ribosome,
    postsyn_ribosome). These annotate RPL/RPS proteins by experimental
    evidence of synaptic localisation, NOT by molecular distinctness; the
-   gene-set membership is largely (98.6 %) a subset of the curated
+   gene-set membership is essentially (98-100%) a subset of the curated
    cytoplasmic ribosomal proteome. The divergent trajectory of the SynGO
    subset is therefore a localisation-coherence signal within the same
    structural-ribosome family that category 4 captures in its non-localised
