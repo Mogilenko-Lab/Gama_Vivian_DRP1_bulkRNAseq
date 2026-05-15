@@ -247,7 +247,7 @@ def assign_semantic_category(row, exclude_pathways=None):
     # 7. Ribosome Biogenesis (assembly, NOT structure)
     # Must check BEFORE ribosome structure categories
     biogenesis_keywords = ['ribosome biogenesis', 'ribosomal subunit assembly',
-                          'ribosome assembly', 'preribosome', 'rrna processing',
+                          'ribosome assembly', 'ribosome_assembly', 'preribosome', 'rrna processing',
                           'ribosomal rna', 'rrna metabol', 'gobp_ribosome_biogenesis',
                           'ribosomal_large_subunit_biogenesis',
                           'ribosomal_small_subunit_biogenesis',

@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "01_Scripts"))
 
-from Python.bump_dashboard.domain.schema import DashboardConfig, GsvaSampleMeta, PathwayRecord, DashboardMetadata
+from Python.bump_dashboard.domain.schema import DashboardConfig, PathwayRecord, DashboardMetadata
 from Python.bump_dashboard.application.data_service import DashboardDataService
 
 
@@ -214,84 +214,56 @@ class TestDashboardDataService:
 
 
 # ---------------------------------------------------------------------------
-# _classify_gsva_driver — unit tests (no I/O)
+# Driver-label loader — unit tests
 # ---------------------------------------------------------------------------
+#
+# Driver classification now lives in 02_Analysis/1.6.gsva_analysis.R and is
+# materialised as Driver_G32A / Driver_R403C columns on master_gsva_all_table.csv.
+# The dashboard service merely reads them via _default_driver_loader().
 
-def _sample_index() -> list[GsvaSampleMeta]:
-    """Minimal 8-sample index: 2 genotypes × 2 days × 2 replicates each.
+class TestDriverLabelLoader:
+    """Verify that _load_driver_labels dedupes, coerces, and tolerates absence."""
 
-    Order: D35 Ctrl s1/s2, D35 G32A s3/s4, D65 Ctrl s5/s6, D65 G32A s7/s8.
-    """
-    rows = [
-        ("s1", "Ctrl", "D35"), ("s2", "Ctrl", "D35"),
-        ("s3", "G32A", "D35"), ("s4", "G32A", "D35"),
-        ("s5", "Ctrl", "D65"), ("s6", "Ctrl", "D65"),
-        ("s7", "G32A", "D65"), ("s8", "G32A", "D65"),
-    ]
-    return [GsvaSampleMeta(sample_id=sid, genotype=g, day=d) for sid, g, d in rows]
+    def _service(self, driver_df):
+        return DashboardDataService(
+            config=DashboardConfig(scopes=["focused"]),
+            raw_loader=lambda: _make_stub_df(2),
+            scope_filter=_focused_filter,
+            driver_loader=lambda: driver_df,
+        )
 
+    def test_dedupes_per_pathway(self):
+        """Master table is cell-level; loader collapses to one entry per pathway."""
+        df = pd.DataFrame({
+            "pathway_id":   ["P::a", "P::a", "P::b", "P::b"],
+            "Driver_G32A":  ["ctrl_driven", "ctrl_driven", "mutant_driven", "mutant_driven"],
+            "Driver_R403C": ["both_moving", "both_moving", "neither_moving", "neither_moving"],
+        })
+        svc = self._service(df)
+        out = svc._load_driver_labels()
+        assert out == {
+            "P::a": {"G32A": "ctrl_driven",   "R403C": "both_moving"},
+            "P::b": {"G32A": "mutant_driven", "R403C": "neither_moving"},
+        }
 
-# Module-level alias so tests call the function without implicit self.
-_clf = DashboardDataService._classify_gsva_driver
-_idx = _sample_index()
-_EPS = 0.10
+    def test_nan_coerced_to_none(self):
+        """NaN driver values (missing arm in upstream) must yield None, not 'nan'."""
+        df = pd.DataFrame({
+            "pathway_id":   ["P::a"],
+            "Driver_G32A":  [np.nan],
+            "Driver_R403C": ["ctrl_driven"],
+        })
+        out = self._service(df)._load_driver_labels()
+        assert out["P::a"] == {"G32A": None, "R403C": "ctrl_driven"}
 
+    def test_loader_returning_none_yields_empty_dict(self):
+        """Missing master CSV → empty dict, dashboard degrades gracefully."""
+        assert self._service(None)._load_driver_labels() == {}
 
-class TestClassifyGsvaDriver:
-    """Unit tests for DashboardDataService._classify_gsva_driver.
-
-    All cases use a fixed 8-element score list aligned with _sample_index():
-    [Ctrl_D35_s1, Ctrl_D35_s2, G32A_D35_s3, G32A_D35_s4,
-     Ctrl_D65_s5, Ctrl_D65_s6, G32A_D65_s7, G32A_D65_s8]
-    """
-
-    def test_mutant_driven(self):
-        """Mutant moves ≬ε, Ctrl stays flat → mutant_driven."""
-        #           Ctrl_D35     G32A_D35     Ctrl_D65     G32A_D65
-        scores = [0.10, 0.12,  -0.20, -0.22,  0.09, 0.11,  0.15, 0.18]
-        # delta_ctrl = 0.10 − 0.11 = −0.01 (|.01| < 0.10)  → not moving
-        # delta_mut  = 0.165 − (−0.21) = +0.375             → moving
-        result = _clf(scores, _idx, "G32A", _EPS)
-        assert result == "mutant_driven"
-
-    def test_ctrl_driven(self):
-        """Ctrl moves ≬ε, mutant stays flat → ctrl_driven."""
-        #           Ctrl_D35     G32A_D35     Ctrl_D65     G32A_D65
-        scores = [0.40, 0.42,  -0.10, -0.12,  0.10, 0.08, -0.11, -0.09]
-        # delta_ctrl = 0.09 − 0.41 = −0.32 (|−0.32| ≥ 0.10)  → moving
-        # delta_mut  = −0.10 − (−0.11) = +0.01 (|0.01| < 0.10) → not moving
-        result = _clf(scores, _idx, "G32A", _EPS)
-        assert result == "ctrl_driven"
-
-    def test_both_moving(self):
-        """Both arms move ≬ε → both_moving."""
-        #           Ctrl_D35     G32A_D35     Ctrl_D65     G32A_D65
-        scores = [0.30, 0.32,  -0.30, -0.32,  -0.20, -0.22,  0.20, 0.22]
-        # delta_ctrl = −0.21 − 0.31 = −0.52  → moving
-        # delta_mut  = 0.21 − (−0.31) = +0.52 → moving
-        result = _clf(scores, _idx, "G32A", _EPS)
-        assert result == "both_moving"
-
-    def test_neither_moving(self):
-        """Both arms flat (|delta| < eps) → neither_moving."""
-        scores = [0.05, 0.06,  -0.05, -0.06,  0.06, 0.05, -0.06, -0.05]
-        result = _clf(scores, _idx, "G32A", _EPS)
-        assert result == "neither_moving"
-
-    def test_none_scores_returns_none(self):
-        """None scores list → None (no GSVA data)."""
-        assert _clf(None, _idx, "G32A", _EPS) is None
-
-    def test_empty_sample_index_returns_none(self):
-        """Empty sample index → None."""
-        assert _clf([0.1] * 8, [], "G32A", _EPS) is None
-
-    def test_length_mismatch_returns_none(self):
-        """Score list shorter than sample_index → None."""
-        assert _clf([0.1, 0.2], _idx, "G32A", _EPS) is None
-
-    def test_missing_mutation_cell_returns_none(self):
-        """If all scores for one required cell are None, returns None."""
-        # Make G32A D65 cells all None (positions 6, 7).
-        scores = [0.30, 0.32, -0.30, -0.32, -0.20, -0.22, None, None]
-        assert _clf(scores, _idx, "G32A", _EPS) is None
+    def test_missing_columns_logs_and_returns_empty(self, caplog):
+        """If master table lacks Driver_* columns, return {} with a warning."""
+        df = pd.DataFrame({"pathway_id": ["P::a"]})  # no Driver_* columns
+        with caplog.at_level("WARNING"):
+            out = self._service(df)._load_driver_labels()
+        assert out == {}
+        assert any("Driver_" in r.message for r in caplog.records)

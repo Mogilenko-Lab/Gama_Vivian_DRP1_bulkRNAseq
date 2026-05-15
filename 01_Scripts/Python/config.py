@@ -87,6 +87,9 @@ EXCLUDE_PATHWAYS = [
     # ECM pathways (not neuronal)
     'GOCC_COLLAGEN_CONTAINING_EXTRACELLULAR_MATRIX',
 
+    # Ribosome binding is too generic / non-informative for trajectory plot
+    'GOMF_RIBOSOME_BINDING',
+
     # Immune pathways (not relevant to iPSC neurons)
     'GOBP_ALPHA_BETA_T_CELL_ACTIVATION',
     'GOBP_ANTIGEN_PROCESSING_AND_PRESENTATION',

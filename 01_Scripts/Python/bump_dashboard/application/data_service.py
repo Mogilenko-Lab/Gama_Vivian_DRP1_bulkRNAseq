@@ -83,6 +83,7 @@ class DashboardDataService:
         raw_loader=None,
         scope_filter=None,
         gsva_long_loader=None,
+        driver_loader=None,
     ) -> None:
         self._config = config or DashboardConfig()
         self._raw_loader = raw_loader or self._default_loader()
@@ -92,6 +93,12 @@ class DashboardDataService:
         self._gsva_long_loader = (
             gsva_long_loader if gsva_long_loader is not None
             else self._default_gsva_long_loader
+        )
+        # driver_loader returns {pathway_id: {"G32A": <label>, "R403C": <label>}}
+        # sourced from master_gsva_all_table.csv — the single upstream source.
+        self._driver_loader = (
+            driver_loader if driver_loader is not None
+            else self._default_driver_loader
         )
 
     # ------------------------------------------------------------------
@@ -127,8 +134,13 @@ class DashboardDataService:
         logger.info("DashboardDataService: attaching per-sample GSVA scores…")
         gsva_sample_index, gsva_lookup = self._load_gsva()
 
+        logger.info("DashboardDataService: loading upstream driver labels…")
+        driver_lookup = self._load_driver_labels()
+
         logger.info("DashboardDataService: assembling domain objects…")
-        records = self._assemble_records(ranked_df, gsva_lookup, gsva_sample_index)
+        records = self._assemble_records(
+            ranked_df, gsva_lookup, gsva_sample_index, driver_lookup
+        )
 
         metadata = self._assemble_metadata(ranked_df, weight_cats, gsva_sample_index)
 
@@ -354,78 +366,84 @@ class DashboardDataService:
             return None
         return None if math.isnan(f) else f
 
-    GSVA_DRIVER_EPSILON: float = 0.10
-
     @staticmethod
-    def _classify_gsva_driver(
-        scores: Optional[list[Optional[float]]],
-        sample_index: list[GsvaSampleMeta],
-        mutation: str,
-        eps: float = 0.10,
-    ) -> Optional[str]:
-        """Classify a pathway's GSVA trajectory driver for one mutation.
+    def _default_driver_loader() -> Optional[pd.DataFrame]:
+        """Load the per-pathway driver classification from the master GSVA table.
 
-        Compares per-arm Δ_GSVA = median(D65) − median(D35) for Ctrl and the
-        named mutation. Returns one of {"mutant_driven", "ctrl_driven",
-        "both_moving", "neither_moving"} when all four (Ctrl/M × D35/D65)
-        cells have at least one valid score; otherwise None.
+        Returns a DataFrame with columns (pathway_id, Driver_G32A, Driver_R403C),
+        or None if the master table is missing — in which case all records get
+        ``gsva_driver=None`` and the dashboard's driver filters degrade to "no
+        data" buckets.
         """
-        import math
-        from statistics import median
+        import sys
+        from pathlib import Path
 
-        if scores is None or not sample_index:
-            return None
-        if len(scores) != len(sample_index):
-            return None
+        sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+        from Python.config import resolve_path  # type: ignore[import]
 
-        cells: dict[tuple[str, str], list[float]] = {}
-        for s, v in zip(sample_index, scores):
+        csv_path = Path(resolve_path("03_Results/02_Analysis/master_gsva_all_table.csv"))
+        if not csv_path.exists():
+            logger.warning(
+                "Master GSVA table not found at %s — driver labels unavailable.",
+                csv_path,
+            )
+            return None
+        return pd.read_csv(
+            csv_path,
+            usecols=["pathway_id", "Driver_G32A", "Driver_R403C"],
+        )
+
+    def _load_driver_labels(self) -> dict[str, dict[str, Optional[str]]]:
+        """Build {pathway_id: {"G32A": label, "R403C": label}} from master_gsva."""
+        try:
+            df = self._driver_loader() if callable(self._driver_loader) else self._driver_loader
+        except Exception as exc:  # noqa: BLE001 — soft-fail keeps pipeline usable
+            logger.warning("Driver-label loader failed (%s); proceeding without.", exc)
+            return {}
+
+        if df is None or len(df) == 0:
+            return {}
+
+        missing = {"pathway_id", "Driver_G32A", "Driver_R403C"} - set(df.columns)
+        if missing:
+            logger.warning(
+                "Master GSVA table is missing %s — driver labels unavailable. "
+                "Re-run 02_Analysis/1.6.gsva_analysis.R to regenerate.",
+                sorted(missing),
+            )
+            return {}
+
+        # Master table is one-row-per-(pathway × genotype × day); driver labels
+        # are denormalized so first non-null per pathway is canonical.
+        deduped = df.drop_duplicates(subset=["pathway_id"], keep="first")
+
+        def _coerce(v: object) -> Optional[str]:
             if v is None:
-                continue
-            try:
-                f = float(v)
-            except (TypeError, ValueError):
-                continue
-            if math.isnan(f):
-                continue
-            cells.setdefault((s.genotype, s.day), []).append(f)
+                return None
+            if isinstance(v, float) and pd.isna(v):
+                return None
+            s = str(v).strip()
+            return s or None
 
-        needed = [
-            ("Ctrl", "D35"), ("Ctrl", "D65"),
-            (mutation, "D35"), (mutation, "D65"),
-        ]
-        if any(not cells.get(k) for k in needed):
-            return None
-
-        delta_ctrl = median(cells[("Ctrl", "D65")]) - median(cells[("Ctrl", "D35")])
-        delta_mut  = median(cells[(mutation, "D65")]) - median(cells[(mutation, "D35")])
-
-        moving_ctrl = abs(delta_ctrl) >= eps
-        moving_mut  = abs(delta_mut)  >= eps
-        if moving_ctrl and moving_mut:
-            return "both_moving"
-        if moving_mut:
-            return "mutant_driven"
-        if moving_ctrl:
-            return "ctrl_driven"
-        return "neither_moving"
+        return {
+            str(row.pathway_id): {
+                "G32A": _coerce(row.Driver_G32A),
+                "R403C": _coerce(row.Driver_R403C),
+            }
+            for row in deduped.itertuples(index=False)
+        }
 
     def _build_mutation_stats(
         self,
         row: pd.Series,
         mut: str,
-        gsva_scores: Optional[list[Optional[float]]] = None,
-        sample_index: Optional[list[GsvaSampleMeta]] = None,
+        driver_label: Optional[str] = None,
     ) -> MutationStats:
         """Construct a ``MutationStats`` from one DataFrame row and mutation."""
         sf = self._safe_float
 
         raw_pattern = row.get(f"Pattern_{mut}")
         pattern = raw_pattern if isinstance(raw_pattern, str) and raw_pattern else None
-
-        driver = self._classify_gsva_driver(
-            gsva_scores, sample_index or [], mut, self.GSVA_DRIVER_EPSILON
-        )
 
         return MutationStats(
             pattern=pattern,  # type: ignore[arg-type]
@@ -438,7 +456,7 @@ class DashboardDataService:
             sig_trajdev=bool(row.get(f"Sig_TrajDev_{mut}", False)),
             rank_early=sf(row, f"Rank_Early_{mut}"),
             rank_late=sf(row, f"Rank_Late_{mut}"),
-            gsva_driver=driver,  # type: ignore[arg-type]
+            gsva_driver=driver_label,  # type: ignore[arg-type]
         )
 
     def _assemble_records(
@@ -446,23 +464,26 @@ class DashboardDataService:
         df: pd.DataFrame,
         gsva_lookup: Optional[dict[str, list[Optional[float]]]] = None,
         sample_index: Optional[list[GsvaSampleMeta]] = None,
+        driver_lookup: Optional[dict[str, dict[str, Optional[str]]]] = None,
     ) -> list[PathwayRecord]:
         """Build and validate ``PathwayRecord`` objects from each DataFrame row."""
         records: list[PathwayRecord] = []
         skipped = 0
         gsva_lookup = gsva_lookup or {}
         sample_index = sample_index or []
+        driver_lookup = driver_lookup or {}
 
         for _, row in df.iterrows():
             try:
                 pid = str(row["pathway_id"])
                 scores = gsva_lookup.get(pid)
+                drivers = driver_lookup.get(pid, {})
                 record = PathwayRecord(
                     pathway_id=pid,
                     description=str(row.get("Description", row["pathway_id"])),
                     database=str(row.get("database", "unknown")),
-                    g32a=self._build_mutation_stats(row, "G32A", scores, sample_index),
-                    r403c=self._build_mutation_stats(row, "R403C", scores, sample_index),
+                    g32a=self._build_mutation_stats(row, "G32A", drivers.get("G32A")),
+                    r403c=self._build_mutation_stats(row, "R403C", drivers.get("R403C")),
                     gsva_scores=scores,
                 )
                 records.append(record)
