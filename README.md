@@ -1,5 +1,7 @@
 # DRP1 Bulk RNA-seq Analysis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20213748.svg)](https://doi.org/10.5281/zenodo.20213748)
+
 # Bioinformatics analyst and github repo maintainer 
 [Anton Zhelonkin, MD](https://github.com/tony-zhelonkin)
 # Project supervisor 

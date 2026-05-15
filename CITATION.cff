@@ -1,5 +1,5 @@
-cff-version: 1.1.0
-message: "If you use this software, please cite it as below."
+cff-version: 1.2.0
+message: "If you use this software, please cite both the associated paper (preferred citation) and the software archive."
 type: software
 title: "Gama_Vivian_DRP1_bulkRNAseq: v2.1.0"
 version: "v2.1.0"
@@ -11,4 +11,34 @@ authors:
   - family-names: Mogilenko
     given-names: Denis
     orcid: "https://orcid.org/0000-0001-5427-5243"
-repository-code: "https://github.com/MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq"
+repository-code: "https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20213748
+    description: Concept DOI (all versions)
+  - type: doi
+    value: 10.5281/zenodo.20213748
+    description: Version DOI (v2.1.0)
+preferred-citation:
+  type: article
+  title: "Patient mutations in DRP1 perturb synaptic maturation of cortical neurons"
+  year: 2025
+  journal: "Journal of Neurodevelopmental Disorders"
+  notes: "Resubmitted; not yet published. Zhelonkin A. and Gama V. are co-corresponding authors."
+  authors:
+    - family-names: Baum
+      given-names: T.
+    - family-names: Bodnya
+      given-names: C.
+    - family-names: Costanzo
+      given-names: J.
+    - family-names: Boulton
+      given-names: D.
+    - family-names: Mogilenko
+      given-names: D.
+    - family-names: Caino
+      given-names: M. C.
+    - family-names: Zhelonkin
+      given-names: A.
+    - family-names: Gama
+      given-names: V.
