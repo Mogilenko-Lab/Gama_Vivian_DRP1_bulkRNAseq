@@ -435,6 +435,68 @@ message(sprintf("  ✓ Significant comparisons (p.adj < 0.05): %d/%d",
                 sum(!is.na(ttest_results$p_adjusted))))
 
 # ============================================================================ #
+# 7b. Driver Classification (per pathway × mutation)                           #
+# ============================================================================ #
+#
+# For each pathway we compute Δ_GSVA = median(D65) − median(D35) per arm
+# (Ctrl, G32A, R403C). With ε = 0.10 the driver label answers "which arm
+# carries the contrast-level pattern":
+#
+#   both_moving      |Δ_ctrl| ≥ ε AND |Δ_mut| ≥ ε
+#   mutant_driven    only |Δ_mut|  ≥ ε
+#   ctrl_driven      only |Δ_ctrl| ≥ ε  (apparent rescue: Ctrl closes the gap)
+#   neither_moving   neither arm moves
+#
+# This is the single source of truth: downstream consumers (incl. the
+# interactive bump dashboard) must read Driver_{G32A,R403C} from this table
+# rather than recomputing.
+
+message("\n📊 Computing driver classification (per pathway × mutation)...")
+
+GSVA_DRIVER_EPS <- 0.10
+
+# Per-(pathway, genotype) median GSVA at D35 and D65 (median across replicates).
+arm_medians <- gsva_long %>%
+  group_by(pathway_id, Genotype, Day) %>%
+  summarize(median_GSVA = median(GSVA_Score, na.rm = TRUE), .groups = "drop") %>%
+  tidyr::pivot_wider(
+    names_from = c(Genotype, Day),
+    values_from = median_GSVA,
+    names_sep = "_D"
+  )
+
+# Δ_arm = median(D65) − median(D35) for each genotype.
+driver_table <- arm_medians %>%
+  mutate(
+    delta_Ctrl  = Ctrl_D65  - Ctrl_D35,
+    delta_G32A  = G32A_D65  - G32A_D35,
+    delta_R403C = R403C_D65 - R403C_D35,
+    Driver_G32A = case_when(
+      is.na(delta_Ctrl) | is.na(delta_G32A) ~ NA_character_,
+      abs(delta_Ctrl) >= GSVA_DRIVER_EPS & abs(delta_G32A) >= GSVA_DRIVER_EPS ~ "both_moving",
+      abs(delta_G32A) >= GSVA_DRIVER_EPS ~ "mutant_driven",
+      abs(delta_Ctrl) >= GSVA_DRIVER_EPS ~ "ctrl_driven",
+      TRUE ~ "neither_moving"
+    ),
+    Driver_R403C = case_when(
+      is.na(delta_Ctrl) | is.na(delta_R403C) ~ NA_character_,
+      abs(delta_Ctrl) >= GSVA_DRIVER_EPS & abs(delta_R403C) >= GSVA_DRIVER_EPS ~ "both_moving",
+      abs(delta_R403C) >= GSVA_DRIVER_EPS ~ "mutant_driven",
+      abs(delta_Ctrl) >= GSVA_DRIVER_EPS ~ "ctrl_driven",
+      TRUE ~ "neither_moving"
+    )
+  ) %>%
+  select(pathway_id, delta_Ctrl, delta_G32A, delta_R403C, Driver_G32A, Driver_R403C)
+
+for (mut in c("G32A", "R403C")) {
+  col <- paste0("Driver_", mut)
+  tally <- table(driver_table[[col]], useNA = "always")
+  message(sprintf("  Driver labels [%s]: %s",
+                  mut,
+                  paste(sprintf("%s=%d", names(tally), tally), collapse = ", ")))
+}
+
+# ============================================================================ #
 # 8. Create Master GSVA Table                                                 #
 # ============================================================================ #
 
@@ -444,6 +506,7 @@ master_gsva <- gsva_group_stats %>%
   left_join(ttest_results, by = c("pathway_id", "Genotype", "Day")) %>%
   left_join(gene_set_metadata %>% select(pathway_id, n_genes_total, n_genes_in_expression),
             by = "pathway_id") %>%
+  left_join(driver_table, by = "pathway_id") %>%
   mutate(
     Trajectory_Category = case_when(
       Day == 35 & Genotype != "Ctrl" ~ "Early",
@@ -468,7 +531,8 @@ master_gsva <- gsva_group_stats %>%
     Mean_GSVA, SD_GSVA, SE_GSVA, N,
     Baseline_CtrlD35, Expression_vs_CtrlD35,
     Ctrl_Mean_Same_Day, Divergence_vs_Ctrl,
-    t_statistic, p_value, p_adjusted, significant
+    t_statistic, p_value, p_adjusted, significant,
+    delta_Ctrl, delta_G32A, delta_R403C, Driver_G32A, Driver_R403C
   ) %>%
   arrange(database, pathway_name, Day, Genotype)
 
