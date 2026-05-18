@@ -2,7 +2,7 @@
 
 ## Overview
 
-Compact CSV summaries that aggregate pathway-level GSEA results into paper-citable tables. This directory backs **Supplementary Table S3** (`ribosome_compartment_summary.csv`, three-compartment Jaccard comparison) and **Supplementary Table S4** (`per_database_pattern_summary.csv` and the preferred dual-denominator companion `per_database_pattern_dual_denominator.csv`, per-collection trajectory-pattern frequencies for all 12 databases). A two-mutation shared-DEG list is also stored here. All tables are derived artifacts: regenerate from `master_gsea_table.csv` and the DE results in `../DE_results/` rather than editing CSVs by hand.
+Compact CSV summaries that aggregate pathway-level GSEA results into paper-citable tables. This directory backs **Supplementary Table S3** (`ribosome_compartment_summary.csv`, three-compartment Jaccard comparison) and **Supplementary Table S4** (`per_database_pattern_summary.csv` and the preferred dual-denominator companion `per_database_pattern_dual_denominator.csv`, per-collection trajectory-pattern frequencies for all 12 databases). The union of the two within-mutation maturation DEG sets (Time_G32A ∪ Time_R403C) is also stored here as `maturation_DEGs_G32A_R403C.csv`, with per-row `Membership` labels (`shared`, `G32A_only`, `R403C_only`). All tables are derived artifacts: regenerate from `master_gsea_table.csv` and the DE results in `../DE_results/` rather than editing CSVs by hand.
 
 ## File inventory
 
@@ -11,7 +11,7 @@ Compact CSV summaries that aggregate pathway-level GSEA results into paper-citab
 | `per_database_pattern_dual_denominator.csv` | 208 | Per-`(database, mutation, pattern)` counts with all three denominators side-by-side; preferred citation source | Supp Table S4 | `02_Analysis/revision/supplements/6a.per_database_pattern_dual_denominator.py` |
 | `per_database_pattern_summary.csv` | 24 | Legacy per-`(database, mutation)` pattern counts; single denominator (5,267 universe) | Supp Table S4 (legacy view) | `02_Analysis/revision/supplements/6b.per_database_pattern_summary.py` |
 | `ribosome_compartment_summary.csv` | 95 | Synaptic / mitochondrial / cytoplasmic ribosome pathways with Jaccard, per-stage NES, and pattern labels | Supp Table S3 | `02_Analysis/revision/supplements/6c.ribosome_compartment_summary.py` |
-| `shared_DEGs_G32A_R403C.csv` | 38 | Genes DE in both G32A and R403C at Day 35 | Reviewer response 5b | `02_Analysis/revision/supplements/5b.extract_shared_maturation_degs.R` |
+| `maturation_DEGs_G32A_R403C.csv` | 154 | Union of Time_G32A and Time_R403C maturation DEGs (FDR < 0.05), labelled `shared` (38) / `G32A_only` (30) / `R403C_only` (86) | Reviewer response 5b; Fig. 4D | `02_Analysis/revision/supplements/5b.extract_maturation_DEGs.R` |
 
 ---
 
@@ -80,11 +80,11 @@ Per-pathway summary of ribosome / translation-machinery gene sets across three c
 | `NES_D35_<mut>`, `NES_TrajDev_<mut>`, `NES_D65_<mut>` | Stage-specific NES values for G32A and R403C |
 | `pattern_G32A`, `pattern_R403C` | Trajectory-pattern label per mutation |
 
-### `shared_DEGs_G32A_R403C.csv`
+### `maturation_DEGs_G32A_R403C.csv`
 
-38 genes called DE in **both** G32A and R403C at Day 35 (FDR < 0.05 in `G32A_vs_Ctrl_D35` and `R403C_vs_Ctrl_D35`). Supports the reviewer-response argument that the two stalk/GTPase mutations converge on a shared early transcriptional signature.
+Union of the two within-mutation maturation DEG sets at FDR < 0.05: 154 genes total = **38 shared** (DE in both `Time_G32A` and `Time_R403C`) + **30 G32A_only** + **86 R403C_only**. Each row carries per-contrast logFC, FDR, and direction for both mutations regardless of which side passed the significance threshold, plus a `Membership` column for set-membership filtering. Backs Fig. 4D and the "core of 38 genes (56% of Time_G32A; 31% of Time_R403C)" narration in `RESULTS_combio0-general.md` line 4.
 
-**Columns:** `Gene`, `G32A_logFC`, `G32A_FDR`, `G32A_dir`, `R403C_logFC`, `R403C_FDR`, `R403C_dir`, `Mean_logFC`.
+**Columns:** `Gene`, `Membership` (`shared` / `G32A_only` / `R403C_only`), `G32A_logFC`, `G32A_FDR`, `G32A_dir`, `R403C_logFC`, `R403C_FDR`, `R403C_dir`, `Mean_logFC`. Sort order: by membership (shared, G32A_only, R403C_only), then by `Mean_logFC` descending within each block.
 
 ---
 
@@ -98,8 +98,8 @@ python3 02_Analysis/revision/supplements/6b.per_database_pattern_summary.py
 # Ribosome compartment summary (Supp Table S3)
 python3 02_Analysis/revision/supplements/6c.ribosome_compartment_summary.py
 
-# Shared DEGs (reads DE_results CSVs)
-Rscript 02_Analysis/revision/supplements/5b.extract_shared_maturation_degs.R
+# Maturation DEGs union (reads DE_results CSVs)
+Rscript 02_Analysis/revision/supplements/5b.extract_maturation_DEGs.R
 ```
 
 All four generators are deterministic.
