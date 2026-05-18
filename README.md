@@ -1,12 +1,14 @@
 # DRP1 Bulk RNA-seq Analysis
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20213748.svg)](https://doi.org/10.5281/zenodo.20213748)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.20213748.svg)](https://doi.org/10.5281/zenodo.20213748)
 
-# Bioinformatics analyst and github repo maintainer 
+## Bioinformatics analyst and GitHub repo maintainer
 [Anton Zhelonkin, MD](https://github.com/tony-zhelonkin)
-# Project supervisor 
+
+## Project supervisor
 [Denis Mogilenko, PhD](https://github.com/MogilenkoLab)
-# Principal Investigator
+
+## Principal Investigator
 [Vivian Gama](https://medschool.vanderbilt.edu/cdb/person/vivian-gama-ph-d/)
 
 

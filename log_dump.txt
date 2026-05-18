@@ -1,0 +1,305 @@
+43a9f14b9f48c4917ae50c4e1a0f8cc6c09a61c4 docs: add Zenodo DOI badge and preferred-citation metadata
+
+- README: add concept-DOI Zenodo badge (10.5281/zenodo.20213748)
+- CITATION.cff: bump to spec 1.2.0, add identifiers block and
+  preferred-citation pointing to the Journal of Neurodevelopmental
+  Disorders manuscript; refresh repository-code URL to Mogilenko-Lab org
+
+
+15adbef52a3be02552dab4c2486a2e22efc34638 docs: add Zenodo DOI badge and preferred-citation metadata
+
+- README: add concept-DOI Zenodo badge (10.5281/zenodo.20213748)
+- CITATION.cff: bump to spec 1.2.0, add identifiers block and
+  preferred-citation pointing to the Journal of Neurodevelopmental
+  Disorders manuscript; refresh repository-code URL to Mogilenko-Lab org
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+217578e16aff4b855b888a2e0a07343dfe30bff8 citation: bump to v2.1.0 for post-revision release
+
+
+ad14a8da87e43a480b42bbbd58fe4a57374b51cf citation: bump to v2.1.0 for post-revision release
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+b261bdf9452c8ddefafbb1042b7cb2fc51b64335 gitignore update
+
+25a68f09b130fc3832174f2a64ad1658854b9c66 docs: refresh AGENTS, DATA_LINEAGE, MIGRATION, and PATTERN_CLASSIFICATION
+
+2f3221a6f08d7ff6ce1000f0526452f0c845ed36 cleanup: remove redundant verification summary report
+
+6368e6c58696523dbc9c0b595bbf89ed708a9c0b docs: add READMEs to Sensitivity_Analysis and Summary subdirectories
+
+77930700a9c86ce8436447b17f084d9fd1b853ac docs: refresh sibling READMEs across 02_Analysis subdirectories
+
+a0a5716d54d256e950475c52999e40fb05f38768 docs: refresh root 02_Analysis README as reviewer navigation entrypoint
+
+174dc7a4a590196f72b8e952448ae2e9d5800f63 docs: refresh per-subdirectory Plots/ READMEs and add missing ones
+
+53cd458c11ca23f3b08c39b21ed022c9a1c491e2 docs: absorb Supplementary 9 and 10 FIGURE_CAPTION content into READMEs
+
+f31b7397f9eac19a29a835c07051eb53319ea1fb cleanup: drop pattern verification summary csv superseded by master table
+
+5d63275df60c56460001137663cf67fff412848d docs: consolidate Tables/ READMEs into single navigation entrypoint
+
+91a8667988ad5fcdeab1b1f3554d821c9826703a gsva: add per-pathway driver classification to master GSVA table
+
+Compute delta_GSVA per arm and label each (pathway x mutation) cell as
+both_moving / mutant_driven / ctrl_driven / neither_moving using a
+0.10 effect-size threshold. This becomes the single source of truth
+for downstream consumers (interactive bump dashboard, etc.).
+
+afd03106129a82058c00b2f1184857355f0b0e97 viz: tidy bump dashboard data service and align semantic categories
+
+Refactor bump dashboard data service for clarity and update its tests
+in lockstep. Add GOMF_RIBOSOME_BINDING to the global exclude list
+(too generic for trajectory plots) and accept the snake_case
+ribosome_assembly variant in the biogenesis-keyword matcher.
+
+cc6a1415ed07919e7dcb61b2b300602b18f75964 gsva: refresh ribosome compartment summary and supplementary jaccard
+
+aceca21ea523d0aeec8eba0af92a825e3a6b5e3b gsva: refresh master GSVA all-pathways table
+
+45dd9c96713eed09de53c086f2d9fa1301b969f8 results: add normalised SynGO running-sum panels and 2x2 composite
+
+09882040f8e2284f6faa0c53fdc1b7babccd2931 results: refresh synaptic-ribosomes Panel C and add per-sample heatmap
+
+40cdb5497a38e8721619e021eb7ac9b2ff1cb53e results: refresh publication figure dotplots at print-grade typography
+
+daab3faebb67ce45c2c13e0815792a4ae4820720 results: refresh pattern-summary normalized panels and 6a scatter
+
+569e5c364b3511291de7f271885240271aa79e28 results: refresh chord diagram outputs with expanded ribosome variants
+
+b54853d993a31d4f756995dd82c820ad7ad6e34f viz: add normalised SynGO running-sum script for Fig. 5D
+
+New 3.10 script builds four GSEA running-sum panels (G32A/R403C x
+D35/D65) sharing a Tol/Wong colorblind-safe palette aligned with the
+Fig. 5 chord diagram, plus a 2x2 composite. Heavy per-gene geometry is
+rasterised at 350 dpi while axes, fonts, and panel borders remain
+vector.
+
+778a6e232235aef552aa4d47622467f819a4dcce viz: parameterise 6a label placement and refresh Supp9 docstring
+
+6a exposes label fontsize, max-chars, and vertical-gap as function
+arguments so the scatter can be re-rendered at multiple sizes without
+forking the call site. Supp9 docstring reformats the gene-set
+inventory as bullet lists for readability.
+
+712bf45fa4cb1a0ae23b39b95d3a76c24f7b8f27 viz: add expanded chord-diagram variants and adopt D35/D65 ring layout
+
+Restructure 3.7 to emit three chord-diagram variants per mutation:
+the original SynGO-focused diagram plus two expanded views that nest
+SynGO synaptic ribosomes inside the broader cytoplasmic ribosome
+context (clean and full). D35 now occupies the outer gene-ring and
+D65 the inner ring for left-to-right temporal reading, with NES
+labels under each pathway arc and adaptive font scaling for legibility
+at journal print size.
+
+536bc0aff71cfb51ca489ba783c91106f539df03 viz: polish dotplot, upset, and pattern-summary figures for print scale
+
+- 3.2: refactor size-legend layout, prefix MitoCarta entries on the
+  semantic figure, bump label fontsizes for journal print.
+- 3.3: swap RPL40 for the HGNC-current UBA52 symbol in the
+  cytoplasmic-ribosome gene set.
+- 3.4: tighten figure size, increase tick/title fonts, and add a
+  single-line count fallback for narrow bar segments.
+
+8f0181916e5b535dbcda7758e166e868b4486490 viz: extend synaptic-ribosomes script and suffix GSVA panel filenames
+
+2.3 adds a per-sample expression heatmap for Panel C alongside the
+existing aggregated heatmap. 2.4 writes critical-period GSVA panels
+with explicit _trajectory and _divergence filename suffixes so the two
+viewpoints can be cited unambiguously.
+
+791c7fba03345501ba16ca92d8612dedc1138ee9 cleanup: remove submission preview figures superseded by final layout
+
+19b7bed927082f8c0de9c7629c704022d371843d results: tag critical-period GSVA panels with view-type suffix
+
+Rename divergence/ and trajectory/ panel PDFs to include the
+_divergence and _trajectory suffix in the filename so the two
+viewpoints can be sorted and cited unambiguously.
+
+b0bd79614561f329c5d411c478d0a0fdae452437 cleanup: archive deprecated ribosome paradox script and outputs
+
+Move 2.1.viz_ribosome_paradox.R and its plot directory into the
+.deprecated/ archives. The three-pool ribosome paradox view has been
+superseded by the dotplot and synaptic-ribosome panels in the final
+figure layout.
+
+1fe192254088ef69fefc13266c57fdaf02fd1b2e viz: re-render calcium signaling gene expression heatmap
+
+b71cf0c8aad2eef2d27c9a6171017de9399ecc45 cleanup: deduplicate DE results, retaining canonical DE_results.csv files
+
+a7eb9be02f56af542eeb0a21471bd8064a8169f0 results: comprehensive update of analysis results, plots, and revision scripts
+
+dfa7bc84e71b3447dc14b52f0ab52faa295fb9f5 gsva: add script to export per-replicate scores in long format
+
+789244847d9d91ca52359d55144bdf9dc91a3b5d viz: refactor interactive bump dashboard into modular Python package
+
+2fd8038b55db25ec5bc6564715ce396584d6fbe3 cleanup: remove deprecated supplemental scripts and temporary context files
+
+94954f4589931b43f98c07a3720020f34ae8b619 scripts: update RNAseq-toolkit and SciAgent-toolkit submodules
+
+052fd526276214542a1fa6128faa1b9c29ba1b4f viz: refine semantic categories and update bump chart significant scope
+
+f5e459c829f1f25604ecc239cd24e084b88e84ac gsva: update critical period trajectory visualizations and pattern statistics
+
+2c8fee8668e44358af4bb72eb7e975491fce7659 gsva: refactor to use GSEA checkpoints as source of truth for gene sets
+
+c93631f74b1e13b2537fac2cc5915e5e7b1ba4d5 pipeline: add titles to DE count plots and update general QC plots
+
+78bde73ca840956865e53e45c859f2d44a8472d9 container setup brush up
+
+52c758f3d22f6b55820f9ff4a293f34914d88cfd Bump RNAseq-toolkit submodule: pre-packaged non-MSigDB geneset databases
+
+f05a4fa8fa933e8a1dac9283211134ccd3dcca15 Update RNAseq-toolkit submodule to dev-GVDRP1 tip
+
+ff6f9143e5db4caec8c0c85fc7f919bce5c4555a Update SciAgent-toolkit submodule
+
+c6f622c62c52972257460f1ad6adaec6a5c7eb5a chore: regenerate DE result tables from checkpoint
+
+15f73baebbb034d6b3dbd23652df55bda15e1998 chore: add rasterized volcano plot outputs
+
+02a08a90e06324c417620c7b68e6eb4f7322196e feat: add DE FDR 0.1 plotting utilities
+
+10ff0a21aba8f5a545566e3e6607b3af7d9c4e65 feat: include time contrast metrics in master pathway table
+
+a2e035ec7f78c2fa2a9cb487d03e0ea90a02468a docs: add agent guidelines and project context
+
+054efcd9585231fc7fac7e44c43c3b305febe1a6 chore: add SciAgent toolkit submodule
+
+4c429818b23ea62fa18dbb2ae4be5dd9c3a91741 chore: remove explorer HTML output from repo
+
+00c21c3204f02f5a1ed6b0631b6134d1862e868a chore: ignore local MCP configs and time context doc
+
+b82c18c896a89dd524e83d1045a70ac2daaec6c0 Add MIT License
+
+884e224decc0b032c6b3cee16952b2aa4edf029c chore: update project metadata and authors for v2.0.0
+
+1b705a531421c424d7ce1f9893baaa42e86cb18b docs: move setup and install guides to docs folder
+
+74a17e29bb4e737df2b3aa877eb734eaa6d09f9f Add CITATION.cff
+
+529c1dfbb8ef64587b8bd80e32579bb07f232618 Remove submission captions and methods
+
+9e15352778f5c91fde956b3ff65fe94a6be6f09b chore: tune linguist language stats
+
+2d34eb2a643e791035207382717e20c120f290fc docs: refine submission text
+
+2461c64f0431bd0da7b1dd1e162a10df3af84040 Merge branch 'dev'
+
+57e1a89a1163a6aad0f67e5f59b73a2d48e9beae docs: update setup and linguist
+
+475c38f72dc080a09d1011d35378f00a2616e3a8 docs: add submission package
+
+4daf31b4194dc850e20c94943f574538444f5afe feat: refine visualization suite
+
+07d25c7622d3cb4441eec94154b215d0024b6289 docs: update v2.0 documentation and environment
+
+9fccbe1c62aac9c9e07c4e4f9054d55fb6aa64b2 feat: add color config and bump chart helpers
+
+9aed70edd21c03d62d9a7f39f7c6479b2483985f data: refresh analysis outputs for v2.0
+
+9b7b92005e5d0f299f912bb1c57207cb6cb69561 feat: restructure analysis pipeline and docs
+
+3168306aecc36e3d37afef5139c2faffd4e0990f feat: use master GSEA tables in Python
+
+f0445b8186a55533b67432bdff0d147114944ef8 feat: extend trajectory pattern framework
+
+2898b7b161bdc8759bd6a315f35b5ab05aa111c4 feat: unify SynGO running-sum plotting
+
+bc187a93a62b099d9f2c81f73c6c916e1341c7a5 Update pattern analysis scripts, results, and docs
+
+e5f965f9cfdf4ed73336b888f922253494472c4f Add development notes
+
+5a8527dadf1f43339ddf1f85703836badc593c88 Update project documentation
+
+43f9c76cea33fdf6212c082b0dc15cf557b01515 Update visualization README files
+
+e852d4d4f3068f3633ddc302e1ed49c1e506b61f Update analysis scripts and GSVA results
+
+b2732a8e4dddefa97d8ee0ccc43ebafd9e514170 Update pattern scripts and definitions
+
+6f0ab5ba3bf397d09371fd5fecd1a3add406a100 Master table clean up
+
+daeec90f9501e91bcc08529cf4fdcc6c4a178219 Master table generation
+
+862d45c84acbb72b2802c2d1c590c18ac0eced9a README update
+
+9d0f3c917069fe507df8e9dfb88be71d25588982 chore: update RNAseq-toolkit submodule
+
+56bba599ff9c971bee688a8756b42ee70ee35ae5 chore: archive deprecated visualization scripts
+
+310960f0a789e6339c8824234d6914776d774bb1 chore: restore ignore patterns
+
+653d88c98c6b49baad463f55181e568357b6a8ba data: refresh analysis outputs and checkpoints
+
+b5913fa6d50f615e4d7c7c9019c761d5462d5ff9 docs: rewrite project guides and results READMEs
+
+961cfd53f1448d54f9df9b4bf76889924421a4c5 feat: add Python publication figure suite
+
+64f5eae6a038931f413d205e7005d05e7917b5d9 feat: refactor R pipeline with checkpointed stages
+
+f9b9c03972fe017691e0b7861f306a3463c88e2e deps: add MitoCarta ref and freeze environments
+
+296aa85490f82ab11a563e11cf6f43f6e0e7bc68 chore: harden devcontainer defaults
+
+03c5532573e0cf0c809de613047b4b209340ea72 Document volcano plot improvements
+
+058d67e4a6518299653ed1bd2b64454f61ed31d0 repo clean up and figures regeneration
+
+61c32122f36f1ab17ed8b3a2200b93fb0b4e5f7c Restructuring repo, adding visualisation for paper resubmission
+
+72588803f0f811fe62a0bf290b08283ca3f18f7e Migrate RNAseq-toolkit submodule to dev-GVDRP1 branch
+
+  - Updated .gitmodules to track dev-GVDRP1
+  - Submodule now uses project-specific branching strategy
+  - Removed duplicate plot_pooled_contrast_heatmap.R
+  - Fixed function naming: plot_pooled_contrast_dotplot
+  - See 01_Scripts/RNAseq-toolkit/MIGRATION.md for migration guide
+
+ee993f6aea830ebaf1caee78adebdcdd18c9b5f8 Submodule minor naming update
+
+b443ad46cba55c1834ce4cb0651cd6dd1c7b4aec Minor docker env update
+
+6172a91c38be1202ebeec840e89dd59454e18429 Finished migration to a new environment
+
+551f6bad9dd1d6226418f1a21783f39cacd7413f Repo cleanup
+
+d6ec164b534c79e03c5d5f204522af8ccea02a6c README update
+
+d76323eab674c36a53066426d9fd9fe5579a3b34 Rerun fig generation to include NNAT (Neuronatin)
+
+fb3347b4b8dd8102b327dc6f957eed92009460ed Updating README on preprocessing steps
+
+935b6d697a0a78d9db7c42c4f5fd8774f3da5cec Removing comments
+
+e5d6f746f3e2126c9ddd67213dc709c4ebc36017 GSEA finished
+
+f21ac3aa1bd8f624f59b781b7456540de8b8fe1b SynGo complete, to do generic GSEA for human
+
+b343c79809d04c3c3751fa2d8c42d8161da7d496 Brushing up interim results
+
+7229a06565bb08425fbb7ad96a0c21db8cf71280 Interim results
+
+aa02356c6d6c15548aaa6cf2386f0378e31dc439 Inspect count matrix
+
+0fcd6fd156f7efa634c1b577611a4855f09212ac README update
+
+c3fd30981a2ead65a118af27b211a250f06bfba8 devcontainer change
+
+25987f43e122d0c3aaf39be3348dacdd661af348 devcontainer update
+
+cdfc5b0a00e060013bee336fb53ce6aed8b573b2 devcontainer change
+
+77d4a25eac0f8f6e87845513d2b0610ed880e1ac devcontainer mount changes to include bash scripts
+
+fc1c9d60b00994b760b504eefc291a1c0ac64973 README update
+
+91b38590776c8093685940b0c3fca68fc3a01c93 Working devcontainer folder structure
+
+a8b33284c98bdd756f1ef6cfcec0205efd653176 Change devcontainer setup
+
+2f5db5c3aee47c0c1fe6836051eb4f7e98899bbf Analysis template draft
+
+c58df172c570f491328aa0c17ac5e76fcccfd01d first commit
