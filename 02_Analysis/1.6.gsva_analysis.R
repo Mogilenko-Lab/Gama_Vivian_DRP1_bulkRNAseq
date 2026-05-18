@@ -64,7 +64,7 @@ config <- list(
 # 1. Load Expression Data                                                     #
 # ============================================================================ #
 
-message("\n📂 Loading expression data and metadata...")
+message("\n Loading expression data and metadata...")
 
 qc_vars <- readRDS(file.path(config$checkpoint_dir, "qc_variables.rds"))
 logCPM <- qc_vars$logCPM
@@ -101,7 +101,7 @@ message(sprintf("  ✓ Expression matrix: %d genes × %d samples",
 # Each `gseaResult` object carries an `@geneSets` slot — a named list of
 # character vectors with the canonical pathway IDs as names.
 
-message("\n🧬 Loading gene sets from GSEA checkpoints (canonical universe)...")
+message("\nLoading gene sets from GSEA checkpoints (canonical universe)...")
 
 all_gene_sets <- list()
 gene_set_metadata <- data.frame()
@@ -189,7 +189,7 @@ for (db in names(all_gene_sets)) {
 # 3. Filter Gene Sets by Size and Expression                                  #
 # ============================================================================ #
 
-message("\n🔍 Filtering gene sets by size and gene availability...")
+message("\n Filtering gene sets by size and gene availability...")
 
 # Flatten all gene sets with database prefix
 all_gene_sets_flat <- list()
@@ -243,7 +243,7 @@ for (i in seq_len(nrow(passed_by_db))) {
 # 4. Run GSVA                                                                  #
 # ============================================================================ #
 
-message("\n🔬 Running GSVA on all pathways...")
+message("\n Running GSVA on all pathways...")
 
 gsva_checkpoint_file <- file.path(config$checkpoint_dir, "gsva_all_pathways.rds")
 
@@ -299,7 +299,7 @@ message(sprintf("✓ GSVA scores: %d pathways × %d samples",
 # 5. Transform to Long Format and Add Metadata                                #
 # ============================================================================ #
 
-message("\n📊 Transforming to long format...")
+message("\n Transforming to long format...")
 
 # Convert to long format
 gsva_long <- gsva_scores %>%
@@ -362,7 +362,7 @@ message(sprintf("  ✓ Group statistics: %d groups", nrow(gsva_group_stats)))
 # 7. Statistical Testing                                                      #
 # ============================================================================ #
 
-message("\n📊 Performing t-tests (mutants vs controls)...")
+message("\n Performing t-tests (mutants vs controls)...")
 
 perform_ttest <- function(pathway_id, genotype, day, gsva_data) {
   if (genotype == "Ctrl") {
@@ -451,7 +451,7 @@ message(sprintf("  ✓ Significant comparisons (p.adj < 0.05): %d/%d",
 # interactive bump dashboard) must read Driver_{G32A,R403C} from this table
 # rather than recomputing.
 
-message("\n📊 Computing driver classification (per pathway × mutation)...")
+message("\n Computing driver classification (per pathway × mutation)...")
 
 GSVA_DRIVER_EPS <- 0.10
 
@@ -500,7 +500,7 @@ for (mut in c("G32A", "R403C")) {
 # 8. Create Master GSVA Table                                                 #
 # ============================================================================ #
 
-message("\n📊 Creating master GSVA table...")
+message("\n Creating master GSVA table...")
 
 master_gsva <- gsva_group_stats %>%
   left_join(ttest_results, by = c("pathway_id", "Genotype", "Day")) %>%

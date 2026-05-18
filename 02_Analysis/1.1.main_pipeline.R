@@ -153,7 +153,7 @@ contrasts <- makeContrasts(
   G32A_vs_Ctrl_D35   = D35_G32A - D35_Control,
   R403C_vs_Ctrl_D35  = D35_R403C - D35_Control,
   G32A_vs_Ctrl_D65   = D65_G32A - D65_Control,
-  R403C_vs_Ctrl_D65  = D65_R403C - D65_Control,
+R403C_vs_Ctrl_D65  = D65_R403C - D65_Control,
 
     # 2. Maturation effects within each genotype
   # Question: How does maturation affect each genotype?I
