@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / '01_Scripts'
 from Python.pattern_definitions import MEANINGFUL_PATTERNS
 
 # Import unified color configuration
-from Python.color_config import HEATMAP_ANNOTATION_COLORS, create_diverging_cmap
+from Python.color_config import HEATMAP_ANNOTATION_COLORS, MUTATION_COLORS, create_diverging_cmap
 
 # =============================================================================
 # PATHS
@@ -386,118 +386,172 @@ def create_sensitivity_heatmap(sensitivity_df: pd.DataFrame, mutation: str, outp
 
 def create_summary_figure(sensitivity_df: pd.DataFrame, claims_df: pd.DataFrame, output_dir: Path):
     """
-    Create comprehensive summary figure showing threshold robustness.
+    Three-panel journal-style summary of threshold-robustness.
+
+    A: pattern distribution at default thresholds, on the 12,221-pathway full
+       background (% of all tested pathways).
+    B: Compensation % across all 81 threshold combinations, full background.
+    C: Compensation % of classifiable pathways across all 81 combinations on
+       the 5,267 ever-significantly enriched universe (RESULTS denominator),
+       with a dashed reference at 50 % (majority of classifiable).
     """
-    fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+    import matplotlib as mpl
 
-    # Get default combination for reference
+    # Okabe-Ito MUTATION_COLORS (matches pattern_summary_normalized.pdf)
+    g32a_color = MUTATION_COLORS['G32A']    # #0072B2 blue
+    r403c_color = MUTATION_COLORS['R403C']  # #D55E00 vermillion
+
     default_data = sensitivity_df[sensitivity_df['is_default']]
-
-    # Use unified mutation colors (distinct from diverging gradient)
-    mutation_colors = HEATMAP_ANNOTATION_COLORS['mutation']
-    g32a_color = mutation_colors['G32A']
-    r403c_color = mutation_colors['R403C']
-
-    # 1. Compensation % across all combinations (boxplot)
-    ax = axes[0, 0]
-    g32a_comp = sensitivity_df[sensitivity_df['mutation'] == 'G32A']['Compensation_pct']
-    r403c_comp = sensitivity_df[sensitivity_df['mutation'] == 'R403C']['Compensation_pct']
-
-    bp = ax.boxplot([g32a_comp, r403c_comp], labels=['G32A', 'R403C'], patch_artist=True)
-    bp['boxes'][0].set_facecolor(g32a_color)
-    bp['boxes'][1].set_facecolor(r403c_color)
-
-    # Add default values as stars
-    for i, (mut, col) in enumerate([(g32a_comp, g32a_color), (r403c_comp, r403c_color)]):
-        default_val = default_data[default_data['mutation'] == ['G32A', 'R403C'][i]]['Compensation_pct'].values[0]
-        ax.scatter([i+1], [default_val], marker='*', s=200, c='red', zorder=5, label='Default' if i==0 else '')
-
-    ax.set_ylabel('Compensation %')
-    ax.set_title('A. Compensation % Across All Threshold Combinations\n(Red star = default thresholds)')
-    ax.legend()
-
-    # 2. Pattern distribution comparison (default thresholds)
-    ax = axes[0, 1]
-    # Use centralized pattern list (Note: this script's classify_pattern_parameterized
-    # may need Sign_reversal added to match pattern_definitions.py)
-    patterns = MEANINGFUL_PATTERNS
-
-    x = np.arange(len(patterns))
-    width = 0.35
-
     g32a_default = default_data[default_data['mutation'] == 'G32A'].iloc[0]
     r403c_default = default_data[default_data['mutation'] == 'R403C'].iloc[0]
+    n_combos = sensitivity_df['combination_id'].nunique()
+    n_full = int(g32a_default['n_pathways'])  # 12,221
 
-    g32a_vals = [g32a_default[p] for p in patterns]
-    r403c_vals = [r403c_default[p] for p in patterns]
+    # Load 5,267-universe sensitivity table (Comp_class_pct lives here)
+    universe_5267_path = (
+        PROJECT_ROOT / "03_Results" / "02_Analysis" / "Supplementary"
+        / "sensitivity_5267universe.csv"
+    )
+    has_5267 = universe_5267_path.exists()
+    df_5267 = pd.read_csv(universe_5267_path) if has_5267 else None
+    n_5267 = 5267
 
-    ax.bar(x - width/2, g32a_vals, width, label='G32A', color=g32a_color)
-    ax.bar(x + width/2, r403c_vals, width, label='R403C', color=r403c_color)
-    ax.set_xticks(x)
-    ax.set_xticklabels(patterns, rotation=45, ha='right')
-    ax.set_ylabel('Number of Pathways')
-    ax.set_title('B. Pattern Distribution (Default Thresholds)')
-    ax.legend()
-
-    # 3. Claim stability: Multiple claims
-    ax = axes[1, 0]
-    total_combos = len(claims_df)
-
-    # Key stable claims
-    claims_to_check = {
-        'R403C > G32A\nCompensation': claims_df['R403C_more_compensation'].sum(),
-        'Progressive\nRare (G32A)': claims_df['progressive_rare_G32A'].sum(),
-        'Progressive\nRare (R403C)': claims_df['progressive_rare_R403C'].sum(),
-        'Comp > Passive\n(G32A)': claims_df['comp_exceeds_passive_G32A'].sum(),
-        'Comp > Passive\n(R403C)': claims_df['comp_exceeds_passive_R403C'].sum(),
+    rc = {
+        'font.family': 'sans-serif',
+        'font.size': 9.5,
+        'axes.titlesize': 10.5,
+        'axes.labelsize': 9.5,
+        'xtick.labelsize': 8.5,
+        'ytick.labelsize': 8.5,
+        'legend.fontsize': 8.5,
+        'axes.spines.top': False,
+        'axes.spines.right': False,
+        'axes.linewidth': 0.8,
+        'xtick.major.width': 0.8,
+        'ytick.major.width': 0.8,
+        'pdf.fonttype': 42,
+        'ps.fonttype': 42,
     }
 
-    claim_names = list(claims_to_check.keys())
-    claim_pcts = [v / total_combos * 100 for v in claims_to_check.values()]
-
-    bars = ax.bar(range(len(claim_names)), claim_pcts, color=['#2ecc71', '#3498db', '#e74c3c', '#9b59b6', '#f39c12'])
-    ax.axhline(y=100, color='green', linestyle='--', alpha=0.5)
-    ax.set_xticks(range(len(claim_names)))
-    ax.set_xticklabels(claim_names, fontsize=8)
-    ax.set_ylabel('% of Combinations Where Claim Holds')
-    ax.set_title(f'C. Claim Stability Across {total_combos} Threshold Combinations')
-    ax.set_ylim(0, 115)
-
-    for bar, pct in zip(bars, claim_pcts):
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2,
-                f'{pct:.0f}%', ha='center', fontsize=10, fontweight='bold')
-
-    # 4. Range of compensation percentages
-    ax = axes[1, 1]
-    for i, mutation in enumerate(['G32A', 'R403C']):
-        mut_data = sensitivity_df[sensitivity_df['mutation'] == mutation]
-        comp_vals = mut_data['Compensation_pct'].values
-
-        ax.scatter(
-            [i] * len(comp_vals),
-            comp_vals,
-            alpha=0.3,
-            s=50,
-            c=[g32a_color, r403c_color][i]
+    with mpl.rc_context(rc):
+        fig, (ax_a, ax_b, ax_c) = plt.subplots(
+            1, 3, figsize=(10.8, 3.5),
+            gridspec_kw={'width_ratios': [0.85, 1.0, 1.05]}
         )
 
-        # Add range annotation
-        min_val, max_val = comp_vals.min(), comp_vals.max()
-        median_val = np.median(comp_vals)
-        ax.hlines(median_val, i-0.2, i+0.2, colors='black', linewidths=2)
-        ax.text(i+0.3, median_val, f'Median: {median_val:.1f}%\nRange: {min_val:.1f}-{max_val:.1f}%',
-                fontsize=9, va='center')
+        # ---- Panel A: pattern distribution at default thresholds ----
+        show_patterns = ['Compensation', 'Sign_reversal', 'Natural_improvement', 'Complex']
+        pretty = ['Compensation', 'Sign reversal', 'Natural improvement', 'Complex']
 
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(['G32A', 'R403C'])
-    ax.set_ylabel('Compensation %')
-    ax.set_title('D. Compensation % Range Across Thresholds')
+        n_g32a = g32a_default['n_pathways']
+        n_r403c = r403c_default['n_pathways']
+        g32a_pct = [g32a_default[p] / n_g32a * 100 for p in show_patterns]
+        r403c_pct = [r403c_default[p] / n_r403c * 100 for p in show_patterns]
 
-    plt.tight_layout()
-    plt.savefig(output_dir / 'sensitivity_analysis_summary.pdf', dpi=150)
-    plt.savefig(output_dir / 'sensitivity_analysis_summary.png', dpi=150)
-    plt.close()
-    print("  Saved summary figure")
+        x = np.arange(len(show_patterns))
+        w = 0.38
+        ax_a.bar(x - w/2, g32a_pct, w, color=g32a_color, label='G32A', edgecolor='none')
+        ax_a.bar(x + w/2, r403c_pct, w, color=r403c_color, label='R403C', edgecolor='none')
+        ax_a.set_xticks(x)
+        ax_a.set_xticklabels(pretty, rotation=25, ha='right', rotation_mode='anchor')
+        ax_a.set_ylabel('% of pathways')
+        ax_a.set_ylim(0, max(max(g32a_pct), max(r403c_pct)) * 1.18)
+        ax_a.legend(frameon=False, loc='upper right',
+                    handlelength=1.0, handletextpad=0.5)
+        ax_a.text(-0.22, 1.10, 'A', transform=ax_a.transAxes,
+                  fontsize=12, fontweight='bold', va='top', ha='left')
+        ax_a.text(0.5, 1.02,
+                  f'default thresholds  ·  N = {n_full:,} (full background)',
+                  transform=ax_a.transAxes, fontsize=7.8, color='#555555',
+                  ha='center', va='bottom')
+
+        # ---- Strip-plot helper (used for B and C) ----
+        def strip(ax, values_by_mut, default_by_mut, xlabel, denom_label,
+                  reference_x=None, x_pad_right=3.5):
+            y_positions = {'G32A': 0, 'R403C': 1}
+            rng = np.random.RandomState(0)
+            all_vals = []
+            for mut, color in [('G32A', g32a_color), ('R403C', r403c_color)]:
+                vals = np.asarray(values_by_mut[mut], dtype=float)
+                all_vals.extend(vals.tolist())
+                default_val = float(default_by_mut[mut])
+                y = y_positions[mut]
+                jitter = rng.uniform(-0.32, 0.32, size=len(vals))
+                ax.scatter(vals, np.full_like(vals, y, dtype=float) + jitter,
+                           s=14, c=color, alpha=0.35, edgecolors='none', zorder=3)
+                ax.hlines(y, vals.min(), vals.max(),
+                          color=color, linewidth=1.2, zorder=2, alpha=0.9)
+                ax.scatter([default_val], [y], marker='|', s=220,
+                           c='black', linewidth=1.8, zorder=5)
+                ax.text(vals.max() + 0.25, y,
+                        f'{vals.min():.1f}–{vals.max():.1f}%',
+                        va='center', fontsize=8.5, color='#333333')
+            if reference_x is not None:
+                ax.axvline(reference_x, color='#888888', linewidth=0.8,
+                           linestyle='--', zorder=1)
+            ax.set_yticks([0, 1])
+            ax.set_yticklabels(['G32A', 'R403C'])
+            ax.invert_yaxis()
+            ax.set_ylim(1.9, -0.9)
+            ax.set_xlabel(xlabel)
+            x_lo = min(all_vals) - 0.4
+            x_hi = max(all_vals) + x_pad_right
+            ax.set_xlim(x_lo, x_hi)
+            ax.text(0.5, 1.02, denom_label,
+                    transform=ax.transAxes, fontsize=7.8, color='#555555',
+                    ha='center', va='bottom')
+
+        # ---- Panel B: Compensation % on full background (12,221) ----
+        values_B = {
+            mut: sensitivity_df.loc[sensitivity_df['mutation'] == mut,
+                                    'Compensation_pct'].values
+            for mut in ['G32A', 'R403C']
+        }
+        defaults_B = {
+            'G32A': g32a_default['Compensation_pct'],
+            'R403C': r403c_default['Compensation_pct'],
+        }
+        strip(ax_b, values_B, defaults_B,
+              xlabel=f'Compensation %  ·  {n_combos} thresholds',
+              denom_label=f'n / N  ·  N = {n_full:,} (full background)')
+        ax_b.text(-0.20, 1.10, 'B', transform=ax_b.transAxes,
+                  fontsize=12, fontweight='bold', va='top', ha='left')
+        ax_b.text(0.98, 0.06, 'tick = default thresholds',
+                  transform=ax_b.transAxes, fontsize=7.5, color='#777777',
+                  ha='right', va='bottom')
+
+        # ---- Panel C: Compensation % of classifiable on 5,267 universe ----
+        if has_5267:
+            values_C = {
+                mut: df_5267.loc[df_5267['mut'] == mut, 'Comp_class_pct'].values
+                for mut in ['G32A', 'R403C']
+            }
+            def_5267 = df_5267[(df_5267['ne'] == 0.5) & (df_5267['ns'] == 1.0) &
+                               (df_5267['ir'] == 0.7) & (df_5267['wr'] == 1.3)]
+            defaults_C = {
+                'G32A': def_5267[def_5267['mut'] == 'G32A']['Comp_class_pct'].values[0],
+                'R403C': def_5267[def_5267['mut'] == 'R403C']['Comp_class_pct'].values[0],
+            }
+            strip(ax_c, values_C, defaults_C,
+                  xlabel=f'Compensation % of classifiable  ·  {n_combos} thresholds',
+                  denom_label=f'n / classifiable  ·  ever-sig. universe = {n_5267:,}',
+                  reference_x=50, x_pad_right=5.5)
+            ax_c.text(-0.20, 1.10, 'C', transform=ax_c.transAxes,
+                      fontsize=12, fontweight='bold', va='top', ha='left')
+            # Place "50 %" label just above the dashed reference line
+            ax_c.text(50, -0.78, '50 %',
+                      fontsize=7.5, color='#888888', va='bottom', ha='center')
+        else:
+            ax_c.text(0.5, 0.5, '5,267-universe table not found',
+                      transform=ax_c.transAxes, ha='center', va='center',
+                      color='#999999')
+            ax_c.axis('off')
+
+        plt.tight_layout()
+        plt.savefig(output_dir / 'sensitivity_analysis_summary.pdf', bbox_inches='tight')
+        plt.savefig(output_dir / 'sensitivity_analysis_summary.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        print("  Saved summary figure (3 panels)")
 
 
 # =============================================================================
