@@ -1,6 +1,10 @@
+# Submodules are pinned by exact commit (the gitlink in this repo's tree).
+# See PROVENANCE.md for the locked commits behind the published v2.1.1 results.
+# HTTPS URLs so a third party can clone the public toolkits without SSH keys.
+# Do NOT run `git submodule update --remote` — it moves the analysis off the pin.
 [submodule "01_Scripts/RNAseq-toolkit"]
 	path = 01_Scripts/RNAseq-toolkit
-	url = git@github.com:tony-zhelonkin/RNAseq-toolkit.git
+	url = https://github.com/tony-zhelonkin/RNAseq-toolkit.git
 [submodule "01_Scripts/SciAgent-toolkit"]
 	path = 01_Scripts/SciAgent-toolkit
-	url = git@github.com:tony-zhelonkin/SciAgent-toolkit.git
+	url = https://github.com/tony-zhelonkin/SciAgent-toolkit.git
