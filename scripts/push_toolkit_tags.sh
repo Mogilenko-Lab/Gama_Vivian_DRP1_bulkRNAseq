@@ -35,4 +35,4 @@ done
 
 echo
 echo "Done. Verify a third party can fetch the pins from scratch:"
-echo "  git clone --recurse-submodules https://github.com/MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq.git /tmp/repro-test"
+echo "  git clone --recurse-submodules https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq.git /tmp/repro-test"

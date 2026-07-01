@@ -244,7 +244,7 @@ Each major plot folder contains a comprehensive `README.md` with generating scri
 
 ```bash
 git clone --recurse-submodules \
-  https://github.com/MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq.git
+  https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq.git
 cd Gama_Vivian_DRP1_bulkRNAseq
 git checkout v2.1.1                       # published release
 git submodule update --init --recursive   # lands on the pinned toolkit commits

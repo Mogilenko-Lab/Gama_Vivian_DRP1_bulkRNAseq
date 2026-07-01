@@ -9,7 +9,7 @@ produced from the pinned commits below.
 | Item | Value |
 |------|-------|
 | Repository tag | **`v2.1.1`** (commit `b1fa558`) — post-revision final |
-| GitHub | `MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq` |
+| GitHub | `Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq` |
 | Zenodo DOI | [10.5281/zenodo.20213748](https://doi.org/10.5281/zenodo.20213748) |
 
 ## Pinned submodules (the lock)
@@ -49,7 +49,7 @@ git submodule status
 
 ```bash
 git clone --recurse-submodules \
-  https://github.com/MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq.git
+  https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq.git
 cd Gama_Vivian_DRP1_bulkRNAseq
 git checkout v2.1.1
 git submodule update --init --recursive   # lands on the pinned commits above

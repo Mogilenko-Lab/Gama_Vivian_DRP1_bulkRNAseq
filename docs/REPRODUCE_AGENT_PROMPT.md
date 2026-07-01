@@ -3,7 +3,7 @@
 Paste the block below to an agent (Claude Code / Codex / Gemini) running on a
 host that **has network access, SSH keys, and `gh` authenticated** for both
 `github.com/tony-zhelonkin` (toolkits) and
-`github.com/MogilenkoLabVUMC` (paper repo). The in-container session prepared the
+`github.com/Mogilenko-Lab` (paper repo). The in-container session prepared the
 `repro-lock-v2.1.1` branch but cannot reach the network to push tags or test a
 clean clone.
 
@@ -42,7 +42,7 @@ durably fetchable by anyone, then prove a clean clone reproduces.
    NO existing credentials cached for the toolkits:
    ```bash
    git clone --recurse-submodules \
-     https://github.com/MogilenkoLabVUMC/Gama_Vivian_DRP1_bulkRNAseq.git /tmp/repro-test
+     https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq.git /tmp/repro-test
    cd /tmp/repro-test && git checkout v2.1.1 && git submodule update --init --recursive
    git submodule status   # MUST show 532982d... and fb6012a...
    ```
