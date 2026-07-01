@@ -21,7 +21,8 @@ Transcriptional analysis of DRP1 mutations (G32A, R403C) in iPSC-derived cortica
 ```
 ├── 00_Data/                       # Reference databases (SynGO, MitoCarta)
 ├── 01_Scripts/
-│   ├── RNAseq-toolkit/           # Git submodule with GSEA & DE helper functions
+│   ├── RNAseq-toolkit/           # Submodule: GSEA & DE helpers (pinned, on results path)
+│   ├── SciAgent-toolkit/         # Submodule: AI-agent tooling (pinned, no result impact)
 │   ├── R_scripts/                # Project-specific helpers (SynGO, MitoCarta integration)
 │   └── Python/                   # Python modules (pattern_definitions, viz_bump_charts)
 ├── 02_Analysis/                   # Analysis pipeline scripts (see SCRIPTS.md)
@@ -135,7 +136,7 @@ DRP1 Mutation → Mitochondrial Positioning Failure
 Synaptic ATP Depletion
     ↓
 ┌─────────────────────────────────┬──────────────────────────────────┐
-│ COMPENSATION (Pools 1 & 3)      │ FAILURE (Pool 2)                 │
+│ COMPENSATION                    │ FAILURE                          │
 ├─────────────────────────────────┼──────────────────────────────────┤
 │ ↑ Ribosome biogenesis           │                                  │
 │ ↑ Mitochondrial translation     |                                  │
@@ -144,7 +145,7 @@ Synaptic ATP Depletion
 │ (Adaptive response)             │ (Energy bottleneck)              │
 └─────────────────────────────────┴──────────────────────────────────┘
     ↓
-Translation Crisis at Synapses → Synaptic Dysfunction → Epilepsy
+Translation Crisis at Synapses → Synaptic Dysfunction → Epilepsy?
 ```
 
 **Key insight**: Compensation fails presumably because the root cause (ATP delivery) remains unresolved—making more ribosomes doesn't help when they lack energy to function.
@@ -186,6 +187,9 @@ Pathway trajectories are classified into 8 mutually exclusive patterns based on 
 
 ## 📈 Trajectory Visualizations
 
+> 🔗 **Explore the interactive dashboard live: [drp1.omicable.com](https://drp1.omicable.com/)**
+> — no setup required. Source: [Mogilenko-Lab/drp1-dashboard](https://github.com/Mogilenko-Lab/drp1-dashboard).
+
 ### Bump Charts
 
 Bump charts show pathway NES trajectories from Early to Late, with curvature representing TrajDev magnitude:
@@ -193,7 +197,7 @@ Bump charts show pathway NES trajectories from Early to Late, with curvature rep
 | Visualization | Script | Description |
 |--------------|--------|-------------|
 | **Static bump charts** | `3.7.viz_bump_chart.py` | PDF/PNG with weighted lines, curves, labels |
-| **Interactive dashboard** | `3.8.viz_interactive_bump_dashboard.py` | HTML explorer with filtering, tooltips |
+| **Interactive dashboard** | `3.8.viz_interactive_bump_dashboard.py` | HTML explorer with filtering, tooltips — [**live**](https://drp1.omicable.com/) · [source](https://github.com/Mogilenko-Lab/drp1-dashboard) |
 
 **How to read curves**:
 - **Upward bulge**: Positive TrajDev (pathway upregulated during maturation)
@@ -202,7 +206,7 @@ Bump charts show pathway NES trajectories from Early to Late, with curvature rep
 
 **Key outputs** (in `03_Results/02_Analysis/Plots/Trajectory_Flow/`):
 - `bump_focused_FINAL_paper_combined.pdf` - Publication-ready figure
-- `interactive_bump_dashboard.html` - Interactive explorer
+- `interactive_bump_dashboard.html` - Interactive explorer (also hosted live at [drp1.omicable.com](https://drp1.omicable.com/))
 
 **See**: `03_Results/02_Analysis/Plots/Trajectory_Flow/README.md` for visualization details.
 
@@ -236,38 +240,28 @@ Each major plot folder contains a comprehensive `README.md` with generating scri
 
 ## 🛠️ Setup
 
-### Prerequisites
-
-- Docker and VS Code with Dev Containers extension
-- Git with submodule support
-- ~10 GB disk space for container and results
-
-### Installation
+**Prerequisites:** Docker, VS Code + Dev Containers extension, git, ~10 GB disk.
 
 ```bash
-# Clone repository
-git clone <repo-url>
+git clone --recurse-submodules \
+  https://github.com/Mogilenko-Lab/Gama_Vivian_DRP1_bulkRNAseq.git
 cd Gama_Vivian_DRP1_bulkRNAseq
+git checkout v2.1.1                       # published release
+git submodule update --init --recursive   # lands on the pinned toolkit commits
 
-# Initialize submodules (RNAseq-toolkit)
-git submodule update --init --recursive
-
-# Configure environment (optional, has defaults)
-cp .env.example .devcontainer/.env
-# Edit .devcontainer/.env to set UID/GID if needed
-
-# Launch container
-# Open folder in VS Code → Command Palette → "Dev Containers: Reopen in Container"
+# Open in VS Code → "Dev Containers: Reopen in Container"
+pip install -r python_requirements_freeze.txt   # inside container
 ```
 
-**Container**: [`scdock-r-dev:v0.5.1`](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.5.1) (R 4.3+, Python 3.x, Bioconductor packages)
+**Container:** [`scdock-r-dev:v0.5.1`](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.5.1) (R 4.3+, Python 3.x, Bioconductor).
+Exact code/env pins are in **[PROVENANCE.md](PROVENANCE.md)**.
 
 ## 🔍 What to Explore First
 
 ### For Biological Interpretation
 
-1. **Interactive Trajectory Dashboard** (`03_Results/02_Analysis/Plots/Trajectory_Flow/interactive_bump_dashboard.html`)
-   - `interactive_bump_dashboard.html` - Explore all pathway trajectories interactively
+1. **Interactive Trajectory Dashboard** — live at **[drp1.omicable.com](https://drp1.omicable.com/)** ([source](https://github.com/Mogilenko-Lab/drp1-dashboard)), or run locally (`03_Results/02_Analysis/Plots/Trajectory_Flow/interactive_bump_dashboard.html`)
+   - Explore all pathway trajectories interactively
    - `bump_focused_FINAL_paper_combined.pdf` - Key publication figure
 
 2. **Publication Figures** (`03_Results/02_Analysis/Plots/Publication_Figures/`)
@@ -454,54 +448,33 @@ Contrasts mapped to developmental stages:
 
 **Full specification:** `docs/PATTERN_CLASSIFICATION.md`
 
-### Reproducibility Features
+### Reproducibility
 
-**Checkpoint caching:**
-- Expensive computations saved as RDS files
-- Automatic loading on re-runs (10x speedup)
-- Force recompute: `config$force_recompute = TRUE`
+Everything needed to reproduce the published results is pinned. See
+**[PROVENANCE.md](PROVENANCE.md)** for the authoritative lock; in brief:
 
-**Version control:**
-- Analysis scripts tracked in git
-- Helper functions via git submodule (`RNAseq-toolkit`)
-- Container environment locked at [scbio-dock v0.5.1](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.5.1)
-- Runtime R packages documented in `R_session_info.txt` and `R_packages.txt`
-- Python dependencies: `requirements.txt` (core packages) and `python_requirements_freeze.txt` (full freeze) 
+| Layer | Pin |
+|-------|-----|
+| Code | repo tag `v2.1.1`; toolkit submodules pinned by exact commit (do **not** bump) |
+| Container | `scdock-r-dev:v0.5.1` (R 4.3+, Python 3.9+, Bioconductor) |
+| R packages | `R_session_info.txt`, `R_packages.txt`; runtime adds in `02_Analysis/0.1.runtime_installs.R` |
+| Python packages | `python_requirements_freeze.txt` (exact freeze), `requirements.txt` (core) |
 
-### Software Versions
-
-**R environment:**
-- **Base:** R 4.3+ (via scbio-dock v0.5.1 container)
-- **Package manifest:** `R_session_info.txt` (complete sessionInfo output)
-- **Package list:** `R_packages.txt` (simple version listing)
-- **Runtime installs:** See `02_Analysis/0.1.runtime_installs.R` for additional packages
-
-**Python environment:**
-- **Base:** Python 3.9+ (via scbio-dock v0.5.1 container)
-- **Core packages:** `requirements.txt` (install with `pip install -r requirements.txt`)
-- **Full freeze:** `python_requirements_freeze.txt` (exact versions for reproducibility)
-
-**Key Python packages:**
-- Data manipulation: pandas (1.3+), numpy (1.21+)
-- Visualization: matplotlib (3.4+), seaborn (0.11+)
-- Specialized plots: upsetplot (0.6+)
-
-**To reproduce exact environment:**
-```bash
-# R packages - manually verify against R_session_info.txt
-Rscript 02_Analysis/0.1.runtime_installs.R
-
-# Python packages - install exact versions
-pip install -r python_requirements_freeze.txt
-```
+Expensive steps are checkpoint-cached as `.rds` (force recompute with
+`config$force_recompute = TRUE`).
 
 ## Supporting tools
 
 ### [scbio-dock v0.5.1](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.5.1) 
 RNAseq docker container for reproducible computational environments across lab projects 
 
-### [RNAseq-toolkit](https://github.com/tony-zhelonkin/RNAseq-toolkit/tree/dev-GVDRP1) 
-Custom RNAseq script automating DE, GSEA analysis and visualisations 
+### [RNAseq-toolkit](https://github.com/tony-zhelonkin/RNAseq-toolkit) (submodule)
+Custom RNAseq helpers automating DE, GSEA and visualisations. Pinned at commit
+`532982d` — see [PROVENANCE.md](PROVENANCE.md). On the results path.
+
+### [SciAgent-toolkit](https://github.com/tony-zhelonkin/SciAgent-toolkit) (submodule)
+AI-agent tooling (skills/prompts) used during development. Pinned at commit
+`fb6012a` for provenance; **does not affect any numerical result**.
 
 ### [Preprocessing scripts](https://github.com/tony-zhelonkin/bulkRNAseq_pipeline_scripts)
 Raw fastq files pre-processed with the custom scripts and bioinformatics tools version locked at [scbio-docker v0.2.0](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.2.0)
@@ -530,12 +503,11 @@ This project utilized AI tools to accelerate analysis pipeline development, biol
 
 ## Documentation
 
-### Quick Start
-- **[SETUP.md](SETUP.md)** - Quick setup guide (post-migration)
-- **[INSTALL.md](INSTALL.md)** - Detailed installation instructions
+### Reproducibility
+- **[PROVENANCE.md](PROVENANCE.md)** - Pinned commits, container, and env behind the published results
 
 ### Analysis Reference
-- **[CLAUDE.md](CLAUDE.md)** - Claude Code instructions, architecture, troubleshooting
+- **[AGENTS.md](AGENTS.md)** / **[CLAUDE.md](CLAUDE.md)** - Agent instructions, methodology and verification rules
 - **[02_Analysis/SCRIPTS.md](02_Analysis/SCRIPTS.md)** - Complete script inventory, dependencies, pattern workflow
 - **[docs/PATTERN_CLASSIFICATION.md](docs/PATTERN_CLASSIFICATION.md)** - 8-pattern trajectory classification framework
 

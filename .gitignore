@@ -11,12 +11,12 @@ __pycache__
 01_Scripts/.ref/
 
 # AI-specs
-CLAUDE.md
+# CLAUDE.md / docs/CLAUDE.md are tracked (repo guidance); local settings + runtime state stay ignored.
 GEMINI.md
-.env
-.mcp.json
 .claude/*
 .gemini/*
+.env
+.mcp.json
 .devcontainer/scripts/setup_pi.sh
 
 
