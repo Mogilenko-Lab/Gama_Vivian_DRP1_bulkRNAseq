@@ -330,16 +330,6 @@ The qualitative claims drawn from the 8-pattern taxonomy — "active opposition 
 
 ---
 
-## Methods Section Template
-
-> Pathway enrichment patterns were classified using a significance-based trajectory framework that distinguishes active adaptive responses from passive developmental changes. Classification required both statistical significance (p.adjust < 0.05 for High confidence, p.adjust < 0.10 for Medium confidence) and biological effect size (|NES| > 0.5). Eight mutually exclusive patterns were defined based on three trajectory stages: Early (mutation effect at Day 35), TrajDev (mutation-specific deviation from control maturation trajectory), and Late (mutation effect at Day 65).
->
-> **Compensation** was assigned to pathways with an Early defect (p.adjust < 0.05, |NES| > 0.5) that showed significant trajectory deviation opposing the defect direction (TrajDev p.adjust < 0.05, |NES| > 0.5, opposite sign to Early) resulting in Late improvement (≥30% reduction in |NES| or |Late NES| < 0.5). **Sign_reversal** patterns were assigned when significant opposing TrajDev resulted in complete reversal of the defect direction (Late sign opposite to Early, with |Late NES| > 0.5), capturing trajectories like synaptic ribosomes (Early upregulated → Late downregulated). **Progressive** patterns required the same Early criteria but with trajectory deviation amplifying the defect direction (same sign as Early) and Late worsening (≥30% increase in |NES|).
->
-> Passive patterns (**Natural_improvement**, **Natural_worsening**) were assigned when Early defects improved or worsened without significant trajectory deviation (TrajDev p.adjust ≥ 0.05 or |NES| ≤ 0.5), indicating reliance on normal developmental buffering rather than active transcriptional adaptation.
->
-> **Late_onset** patterns captured pathways with no significant Early defect (p.adjust ≥ 0.10 or |NES| ≤ 0.5) but emergence of strong Late dysfunction (p.adjust < 0.05, |NES| > 1.0). **Transient** patterns identified strong Early defects (p.adjust < 0.05, |NES| > 1.0) that fully resolved by Late stage (|NES| < 0.5). Pathways not fitting these criteria were classified as **Complex**, with optional subtyping into Stagnant, Weak_early, Multiphasic, or Weak_signal for metadata purposes.
-
 ## Change Log
 
 | Date | Version | Changes |

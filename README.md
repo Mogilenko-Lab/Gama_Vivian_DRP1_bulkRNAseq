@@ -49,7 +49,7 @@ Transcriptional analysis of DRP1 mutations (G32A, R403C) in iPSC-derived cortica
 ├── docs/                          # Extended documentation
 │   ├── bio_notes.md              # Curated biological notes and mechanistic model
 │   ├── PATTERN_CLASSIFICATION.md # Pattern classification system documentation
-│   ├── CHANGELOG.md              # Analysis evolution and version history
+│   ├── DATA_LINEAGE.md           # Data provenance and artefact map
 │   └── MIGRATION.md              # Container setup and migration notes
 └── .deprecated/                   # Archived materials (old docs, backups)
 ```
@@ -218,7 +218,7 @@ Bump charts show pathway NES trajectories from Early to Late, with curvature rep
 |------|---------|
 | [02_Analysis/SCRIPTS.md](02_Analysis/SCRIPTS.md) | Script inventory: active vs deprecated, dependencies, usage |
 | [docs/PATTERN_CLASSIFICATION.md](docs/PATTERN_CLASSIFICATION.md) | Pattern classification framework (canonical reference) |
-| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Version history, reviewer tracking, major changes |
+| [PROVENANCE.md](PROVENANCE.md) | Reproducibility lock: pinned toolkit commits, container, environment |
 
 ### Scientific Context
 
@@ -514,7 +514,7 @@ This project utilized AI tools to accelerate analysis pipeline development, biol
 ### Scientific Documentation
 See **[docs/](docs/)** directory for:
 - **[Biological Notes](docs/bio_notes.md)** - Curated literature notes and mechanistic model
-- **[CHANGELOG](docs/CHANGELOG.md)** - Analysis improvements since v1.0
+- **[Data Lineage](docs/DATA_LINEAGE.md)** - Data provenance and manuscript artefact map
 - **[Migration Notes](docs/MIGRATION.md)** - Technical migration details
 
 ### Results Documentation

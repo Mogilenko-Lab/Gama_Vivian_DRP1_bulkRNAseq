@@ -2,7 +2,7 @@
 
 This directory contains comprehensive documentation for the DRP1 bulk RNA-seq analysis project.
 
-**Last Updated:** 2025-12-09
+**Last Updated:** 2026-06-30
 
 ---
 
@@ -16,7 +16,7 @@ This directory contains comprehensive documentation for the DRP1 bulk RNA-seq an
 | Script reference | [../02_Analysis/SCRIPTS.md](../02_Analysis/SCRIPTS.md) |
 | **Pattern classification** | [PATTERN_CLASSIFICATION.md](PATTERN_CLASSIFICATION.md) |
 | Scientific background | [bio_notes.md](bio_notes.md) |
-| Version history | [CHANGELOG.md](CHANGELOG.md) |
+| Reproducibility lock | [../PROVENANCE.md](../PROVENANCE.md) |
 | Data lineage | [DATA_LINEAGE.md](DATA_LINEAGE.md) |
 | Migration notes | [MIGRATION.md](MIGRATION.md) |
 
@@ -68,9 +68,12 @@ This directory contains comprehensive documentation for the DRP1 bulk RNA-seq an
 
 ### Project Documentation
 
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history, improvements, and changes since v1.0
+- **[../PROVENANCE.md](../PROVENANCE.md)** - Reproducibility lock: pinned submodule commits, container, environment, and clean-clone reproduce steps
 - **[MIGRATION.md](MIGRATION.md)** - Technical migration notes from original workstation setup
 - **[DATA_LINEAGE.md](DATA_LINEAGE.md)** - Data provenance and processing history
+
+> Version history lives in the git tags and commit log (`git tag`, `git log`); the
+> per-release Zenodo archive is linked from [../PROVENANCE.md](../PROVENANCE.md).
 
 ---
 
@@ -94,7 +97,7 @@ This directory contains comprehensive documentation for the DRP1 bulk RNA-seq an
 1. Start with [../README.md](../README.md) - Key findings and overview
 2. Explore [../03_Results/02_Analysis/Plots/README.md](../03_Results/02_Analysis/Plots/README.md) - Visualization guide
 3. Reference [bio_notes.md](bio_notes.md) - Detailed mechanistic context
-4. Check [CHANGELOG.md](CHANGELOG.md) - Analysis evolution and refinements
+4. See [../PROVENANCE.md](../PROVENANCE.md) - Exact code, versions, and environment behind the published figures
 
 ---
 
@@ -122,24 +125,15 @@ Individual plot folders contain detailed README files explaining:
 
 ---
 
-## Historical Archive
+## Version History
 
-### Frozen Analysis (v2.0.0)
+- **`v1.0`** (commit `d6ec164`) — original manuscript submission (frozen).
+- **`v2.1.1`** (commit `b1fa558`) — post-revision final; the published state. See
+  [../PROVENANCE.md](../PROVENANCE.md) for the reproducibility lock (pinned toolkit
+  commits, container, environment).
+- Deprecated plots from earlier revisions: `../03_Results/02_Analysis/Plots/.deprecated/`
 
-Manuscript submission version:
-- Git tag: `v2.0.0` (commit `d6ec164`)
-- Archive: `../03_Results/02_Analysis/.archive/1stRun/`
-- Deprecated plots: `../03_Results/02_Analysis/Plots/.deprecated/`
-
-### Session Archives
-
-Documentation from specific analysis sessions:
-
-| Archive | Date | Contents |
-|---------|------|----------|
-| [archive/2025-11-26_pattern_cleanup/](archive/2025-11-26_pattern_cleanup/) | 2025-11-26 | Pattern system unification (7-pattern to centralized) |
-| [archive/2025-11-26_pattern_verification/](archive/2025-11-26_pattern_verification/) | 2025-11-26 | Pattern claims verification reports |
-| [archive/mapping.md](archive/mapping.md) | 2025-11 | Historical file mapping documentation |
+Full history is in the git tags and commit log (`git tag`, `git log`).
 
 ---
 
@@ -149,20 +143,17 @@ Documentation from specific analysis sessions:
 docs/
 ├── README.md                      # This index
 ├── CLAUDE.md                      # Claude Code instructions and architecture
-├── SETUP.md                       # Quick setup guide
+├── SETUP.md                       # Setup pointer → PROVENANCE.md + INSTALL.md
 ├── INSTALL.md                     # Detailed installation instructions
 ├── PATTERN_CLASSIFICATION.md      # Pattern system (canonical)
 ├── bio_notes.md                   # Curated biological notes
-├── CHANGELOG.md                   # Version history
 ├── MIGRATION.md                   # Migration notes
 ├── DATA_LINEAGE.md                # Data provenance
-└── archive/
-    ├── 2025-11-26_pattern_cleanup/
-    ├── 2025-11-26_pattern_verification/
-    └── mapping.md
+└── REPRODUCE_AGENT_PROMPT.md      # Clean-clone reproduce hand-off
 
 Root documentation:
-└── README.md                      # Project overview
+├── README.md                      # Project overview
+└── PROVENANCE.md                  # Reproducibility lock (pins, container, env)
 ```
 
 ---
