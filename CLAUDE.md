@@ -1,1 +1,1 @@
-See `AGENTS.md` in this directory for comprehensive repo guidelines.
+@AGENTS.md
