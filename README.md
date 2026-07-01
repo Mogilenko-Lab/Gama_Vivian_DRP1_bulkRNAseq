@@ -136,7 +136,7 @@ DRP1 Mutation → Mitochondrial Positioning Failure
 Synaptic ATP Depletion
     ↓
 ┌─────────────────────────────────┬──────────────────────────────────┐
-│ COMPENSATION (Pools 1 & 3)      │ FAILURE (Pool 2)                 │
+│ COMPENSATION                    │ FAILURE                          │
 ├─────────────────────────────────┼──────────────────────────────────┤
 │ ↑ Ribosome biogenesis           │                                  │
 │ ↑ Mitochondrial translation     |                                  │
@@ -145,7 +145,7 @@ Synaptic ATP Depletion
 │ (Adaptive response)             │ (Energy bottleneck)              │
 └─────────────────────────────────┴──────────────────────────────────┘
     ↓
-Translation Crisis at Synapses → Synaptic Dysfunction → Epilepsy
+Translation Crisis at Synapses → Synaptic Dysfunction → Epilepsy?
 ```
 
 **Key insight**: Compensation fails presumably because the root cause (ATP delivery) remains unresolved—making more ribosomes doesn't help when they lack energy to function.
@@ -187,6 +187,9 @@ Pathway trajectories are classified into 8 mutually exclusive patterns based on 
 
 ## 📈 Trajectory Visualizations
 
+> 🔗 **Explore the interactive dashboard live: [drp1.omicable.com](https://drp1.omicable.com/)**
+> — no setup required. Source: [Mogilenko-Lab/drp1-dashboard](https://github.com/Mogilenko-Lab/drp1-dashboard).
+
 ### Bump Charts
 
 Bump charts show pathway NES trajectories from Early to Late, with curvature representing TrajDev magnitude:
@@ -194,7 +197,7 @@ Bump charts show pathway NES trajectories from Early to Late, with curvature rep
 | Visualization | Script | Description |
 |--------------|--------|-------------|
 | **Static bump charts** | `3.7.viz_bump_chart.py` | PDF/PNG with weighted lines, curves, labels |
-| **Interactive dashboard** | `3.8.viz_interactive_bump_dashboard.py` | HTML explorer with filtering, tooltips |
+| **Interactive dashboard** | `3.8.viz_interactive_bump_dashboard.py` | HTML explorer with filtering, tooltips — [**live**](https://drp1.omicable.com/) · [source](https://github.com/Mogilenko-Lab/drp1-dashboard) |
 
 **How to read curves**:
 - **Upward bulge**: Positive TrajDev (pathway upregulated during maturation)
@@ -203,7 +206,7 @@ Bump charts show pathway NES trajectories from Early to Late, with curvature rep
 
 **Key outputs** (in `03_Results/02_Analysis/Plots/Trajectory_Flow/`):
 - `bump_focused_FINAL_paper_combined.pdf` - Publication-ready figure
-- `interactive_bump_dashboard.html` - Interactive explorer
+- `interactive_bump_dashboard.html` - Interactive explorer (also hosted live at [drp1.omicable.com](https://drp1.omicable.com/))
 
 **See**: `03_Results/02_Analysis/Plots/Trajectory_Flow/README.md` for visualization details.
 
@@ -257,8 +260,8 @@ Exact code/env pins are in **[PROVENANCE.md](PROVENANCE.md)**.
 
 ### For Biological Interpretation
 
-1. **Interactive Trajectory Dashboard** (`03_Results/02_Analysis/Plots/Trajectory_Flow/interactive_bump_dashboard.html`)
-   - `interactive_bump_dashboard.html` - Explore all pathway trajectories interactively
+1. **Interactive Trajectory Dashboard** — live at **[drp1.omicable.com](https://drp1.omicable.com/)** ([source](https://github.com/Mogilenko-Lab/drp1-dashboard)), or run locally (`03_Results/02_Analysis/Plots/Trajectory_Flow/interactive_bump_dashboard.html`)
+   - Explore all pathway trajectories interactively
    - `bump_focused_FINAL_paper_combined.pdf` - Key publication figure
 
 2. **Publication Figures** (`03_Results/02_Analysis/Plots/Publication_Figures/`)
