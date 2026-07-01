@@ -303,6 +303,15 @@ GSVA run in Stage 5. The comprehensive all-pathway GSVA table is produced by `1.
 
 All paths are relative to `03_Results/02_Analysis/`.
 
+> **Note — internal navigation, not the canonical figure list.** This table maps
+> analysis outputs to the scripts that produce them, for computational
+> reproducibility. The figure/panel numbers reflect an internal working layout;
+> after multiple manuscript-revision iterations they may no longer match the
+> final published figure numbering, and some rows point to intermediate artefacts
+> rather than final paper figures. Treat the published manuscript as the source
+> of truth for figure identity — use this table to locate the code and outputs
+> behind each analysis, not to enumerate the final figures.
+
 | Figure / Table | Source File Path | Producing Script |
 |----------------|-----------------|------------------|
 | **Fig 4 (= Fig 6A)** — Semantic pathway dotplot | `Plots/Publication_Figures_Dotplot/Fig4_Semantic_Pathway_Overview_dotplot.pdf` | `02_Analysis/3.2.publication_figures_dotplot.py` |

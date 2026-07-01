@@ -320,4 +320,4 @@ pip install -r python_requirements_freeze.txt
 - **Container documentation:** [scbio-docker v0.5.1](https://github.com/tony-zhelonkin/scbio-docker/tree/v0.5.1)
 - **Analysis documentation:** [CLAUDE.md](CLAUDE.md) - Detailed analysis guide
 - **Script reference:** [02_Analysis/SCRIPTS.md](02_Analysis/SCRIPTS.md) - Script inventory
-- **Analysis changelog:** [docs/CHANGELOG.md](docs/CHANGELOG.md) - Analysis evolution and version history
+- **Reproducibility lock:** [../PROVENANCE.md](../PROVENANCE.md) - Pinned toolkit commits, container, and environment

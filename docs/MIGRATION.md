@@ -52,7 +52,6 @@ This document describes the migration of the GVDRP1 bulk RNA-seq analysis reposi
 
 **New Files:**
 - `MIGRATION.md` (this file) - Migration documentation
-- `CHANGELOG.md` - Tracking changes for reviewer responses
 - Updated `README.md` - Added migration notes and new setup instructions
 
 **Backup Files:**

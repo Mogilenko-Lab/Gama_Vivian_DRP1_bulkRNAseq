@@ -567,7 +567,6 @@ This repository was migrated from an original workstation on 2025-11-19. Key cha
 **See also:**
 - `MIGRATION.md` - Complete migration documentation
 - `SETUP.md` - Container setup instructions
-- `CHANGELOG.md` - Tracking analysis updates
 
 ## Key Findings Summary
 
@@ -637,7 +636,6 @@ top_pathways <- head(pathways, 20)
 - `README.md` - Project overview and quick facts
 - `MIGRATION.md` - Migration documentation
 - `SETUP.md` - Container setup guide
-- `CHANGELOG.md` - Analysis change tracking
 - `ISSUES.md` - Known issues and limitations
 - `VOLCANO_IMPROVEMENTS_SUMMARY.md` - Volcano plot refinements
 - `SESSION_SUMMARY*.md` - Session handoff notes
